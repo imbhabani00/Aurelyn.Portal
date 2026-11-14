@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Access denied";
+    ViewData["CardClass"] = "is-compact";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+@section Hero {
+    <svg class="auth-art" viewBox="0 0 240 210" aria-hidden="true"><use href="#art-denied" /></svg>
+    <h1>Access <span>Denied</span></h1>
+    <p>You don't have permission to open this page.</p>
+}
+
+<h2 class="auth-title">403 · No access</h2>
+<p class="auth-sub">Your role doesn't include this area. If you think this is a mistake, ask an administrator to update your permissions.</p>
+
+<a asp-controller="Dashboard" asp-action="Index" class="au-btn au-btn-primary auth-btn" style="text-decoration:none">
+    Back to Dashboard
+    <span class="arrow"><svg><use href="#i-arrow" /></svg></span>
+</a>
+<a asp-controller="Account" asp-action="Login" class="au-btn au-btn-secondary auth-btn mt-3" style="text-decoration:none;height:48px">Sign in with another account</a>

@@ -1,0 +1,558 @@
+﻿:root {
+    --au-bg: #eef0ff;
+    --au-surface: #f3f4ff;
+    --au-white: #fbfbff;
+    --au-primary: #625ee8;
+    --au-primary-dark: #4541c9;
+    --au-text: #17165d;
+    --au-muted: #7779aa;
+    --au-line: rgba(255,255,255,.9);
+    --au-shadow: 8px 8px 18px #c9ccef, -8px -8px 18px #fff;
+    --au-inset: inset 4px 4px 9px #d3d6f5, inset -4px -4px 9px #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--au-text);
+    background: var(--au-bg);
+    font-family: Inter,"Segoe UI",Arial,sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button, input {
+    font: inherit;
+}
+
+.au-shell {
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    gap: 18px;
+}
+
+.au-sidebar {
+    width: 238px;
+    flex: 0 0 238px;
+    height: calc(100vh - 36px);
+    position: sticky;
+    top: 18px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px 14px;
+    border: 1px solid var(--au-line);
+    border-radius: 28px;
+    background: linear-gradient(145deg,#f7f8ff,#e9ebff);
+    box-shadow: var(--au-shadow);
+    z-index: 1000;
+}
+
+.au-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 10px 22px;
+}
+
+.au-brand-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 23px;
+    border-radius: 14px;
+    background: linear-gradient(145deg,#817dff,#4d49ce);
+    box-shadow: 5px 5px 11px #c4c7ee,-4px -4px 9px #fff;
+}
+
+.au-brand-name {
+    font-size: 17px;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -.5px;
+}
+
+.au-brand-sub {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--au-muted);
+    font-weight: 500;
+}
+
+.au-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 2px 8px;
+    scrollbar-width: thin;
+}
+
+.au-nav-group {
+    margin: 8px 0 15px;
+}
+
+.au-nav-label {
+    display: block;
+    padding: 0 11px 7px;
+    color: #9294bd;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.au-nav-link {
+    min-height: 37px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 11px;
+    margin: 3px 0;
+    border-radius: 13px;
+    color: #4c4b91;
+    font-size: 12px;
+    font-weight: 600;
+    transition: .2s ease;
+}
+
+    .au-nav-link svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .au-nav-link:hover {
+        color: var(--au-primary-dark);
+        background: #f4f5ff;
+        box-shadow: var(--au-inset);
+    }
+
+    .au-nav-link.active {
+        color: #fff;
+        background: linear-gradient(110deg,#7773f2,#5b57dc);
+        box-shadow: 4px 5px 10px #c5c7ef,-3px -3px 8px #fff;
+    }
+
+.au-sidebar-bottom {
+    border-top: 1px solid rgba(125,127,190,.15);
+    padding: 13px 5px 0;
+}
+
+.au-user-mini {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 4px 5px 11px;
+}
+
+.au-avatar {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: linear-gradient(145deg,#8884ff,#504bd1);
+    font-size: 11px;
+    font-weight: 800;
+    overflow: hidden;
+    box-shadow: 3px 3px 8px #c8cbed,-3px -3px 8px #fff;
+}
+
+    .au-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.au-user-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.au-user-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.au-user-role {
+    display: block;
+    margin-top: 2px;
+    color: var(--au-muted);
+    font-size: 9px;
+}
+
+.au-logout-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    color: #6565a0;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 12px;
+}
+
+    .au-logout-link:hover {
+        background: #f7f7ff;
+        color: #d34d70;
+        box-shadow: var(--au-inset);
+    }
+
+    .au-logout-link svg {
+        width: 16px;
+        height: 16px;
+    }
+
+.au-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.au-topbar {
+    min-height: 62px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 8px 15px;
+    border: 1px solid var(--au-line);
+    border-radius: 22px;
+    background: linear-gradient(145deg,#f8f9ff,#eceeff);
+    box-shadow: var(--au-shadow);
+}
+
+.au-menu-toggle {
+    display: none;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 12px;
+    color: var(--au-primary);
+    background: var(--au-surface);
+    box-shadow: var(--au-inset);
+}
+
+.au-search {
+    width: min(390px,45%);
+    height: 39px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 13px;
+    border-radius: 15px;
+    background: #f0f1ff;
+    box-shadow: var(--au-inset);
+    color: #8587b4;
+}
+
+    .au-search svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+    }
+
+    .au-search input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--au-text);
+        font-size: 11px;
+    }
+
+        .au-search input::placeholder {
+            color: #999bc0;
+        }
+
+.au-topbar-spacer {
+    flex: 1;
+}
+
+.au-icon-btn {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    position: relative;
+    border: 0;
+    border-radius: 13px;
+    color: #5553bb;
+    background: #f1f2ff;
+    box-shadow: var(--au-shadow);
+}
+
+    .au-icon-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+.au-notif-dot {
+    position: absolute;
+    top: 5px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border: 1px solid white;
+    border-radius: 50%;
+    background: #f05d78;
+}
+
+.au-user-wrap {
+    position: relative;
+}
+
+.au-user-button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 4px 10px 4px 5px;
+    border: 0;
+    border-radius: 18px;
+    color: var(--au-text);
+    background: #f0f1ff;
+    box-shadow: var(--au-inset);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+    .au-user-button .au-avatar {
+        width: 31px;
+        height: 31px;
+        flex-basis: 31px;
+    }
+
+    .au-user-button > svg {
+        width: 13px;
+        height: 13px;
+    }
+
+.au-user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    width: 190px;
+    padding: 8px;
+    border: 1px solid white;
+    border-radius: 16px;
+    background: #f3f4ff;
+    box-shadow: 0 12px 28px #bfc2e8;
+    z-index: 1100;
+}
+
+    .au-user-dropdown.open {
+        display: block;
+    }
+
+.au-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px;
+    border-radius: 10px;
+    color: #4e4d91;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+    .au-dropdown-item:hover {
+        background: #fff;
+    }
+
+    .au-dropdown-item svg {
+        width: 15px;
+        height: 15px;
+    }
+
+.au-page-content {
+    padding: 20px 2px 5px;
+}
+
+.au-mobile-overlay {
+    display: none;
+}
+
+.au-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(44,43,100,.25);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+}
+
+.au-modal-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2001;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+    .au-modal-backdrop.open, .au-modal-container.open {
+        display: flex;
+    }
+
+.au-modal-box {
+    width: min(560px,100%);
+    max-height: 90vh;
+    overflow: auto;
+    border: 1px solid white;
+    border-radius: 22px;
+    background: #f0f1ff;
+    box-shadow: 15px 15px 35px #aeb2dc,-10px -10px 30px #fff;
+}
+
+    .au-modal-box.modal-sm {
+        width: min(390px,100%);
+    }
+
+    .au-modal-box.modal-lg {
+        width: min(760px,100%);
+    }
+
+    .au-modal-box.modal-xl {
+        width: min(1000px,100%);
+    }
+
+.au-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 17px 20px;
+    border-bottom: 1px solid #dfe1fa;
+}
+
+.au-modal-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.au-modal-close {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 10px;
+    color: #5d5bc6;
+    background: #f2f3ff;
+    box-shadow: var(--au-shadow);
+    font-size: 20px;
+}
+
+.au-modal-body {
+    padding: 20px;
+}
+
+.au-spinner {
+    width: 32px;
+    height: 32px;
+    margin: 25px auto;
+    border: 3px solid #d8daf8;
+    border-top-color: #625ee8;
+    border-radius: 50%;
+    animation: au-spin .8s linear infinite;
+}
+
+@keyframes au-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media(max-width:1050px) {
+    .au-sidebar {
+        width: 215px;
+        flex-basis: 215px;
+    }
+}
+
+@media(max-width:800px) {
+    .au-shell {
+        padding: 10px;
+        gap: 0;
+    }
+
+    .au-sidebar {
+        position: fixed;
+        top: 10px;
+        bottom: 10px;
+        left: 10px;
+        height: auto;
+        width: 260px;
+        transform: translateX(calc(-100% - 20px));
+        transition: transform .25s ease;
+    }
+
+        .au-sidebar.open {
+            transform: translateX(0);
+        }
+
+    .au-mobile-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(35,34,90,.25);
+        z-index: 999;
+    }
+
+        .au-mobile-overlay.open {
+            display: block;
+        }
+
+    .au-menu-toggle {
+        display: grid;
+        place-items: center;
+    }
+
+    .au-topbar {
+        min-height: 58px;
+        padding: 7px 9px;
+    }
+
+    .au-search {
+        width: auto;
+        flex: 1;
+    }
+
+    .au-page-content {
+        padding-top: 15px;
+    }
+}
+
+@media(max-width:480px) {
+    .au-topbar {
+        gap: 8px;
+    }
+
+    .au-user-button {
+        padding-right: 7px;
+    }
+        .au-user-button .au-user-label {
+            display: none;
+        }
+    .au-search {
+        max-width: 180px;
+    }
+}

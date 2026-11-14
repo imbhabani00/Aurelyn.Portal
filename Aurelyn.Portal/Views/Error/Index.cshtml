@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Something went wrong";
+    ViewData["CardClass"] = "is-compact";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    var code = ViewData["Code"]?.ToString() ?? "Error";
+    var requestId = ViewData["RequestId"]?.ToString();
+}
+
+@section Hero {
+    <svg class="auth-art" viewBox="0 0 240 210" aria-hidden="true">
+        <circle cx="120" cy="105" r="95" fill="#fff0d4" opacity=".6" />
+        <path d="M120 38 196 168H44L120 38Z" fill="#e9a23b" stroke="#e9a23b" stroke-width="14" stroke-linejoin="round" />
+        <path d="M120 82v44" stroke="#fff" stroke-width="12" stroke-linecap="round" />
+        <circle cx="120" cy="146" r="7" fill="#fff" />
+    </svg>
+    <h1>Something <span>went wrong</span></h1>
+    <p>The request couldn't be completed.</p>
+}
+
+<h2 class="auth-title">Error @code</h2>
+<p class="auth-sub">We couldn't complete that request. Try again, or head back to the dashboard.</p>
+@if (!string.IsNullOrEmpty(requestId))
+{
+    <p class="auth-sub" style="margin-top:-10px;font-size:10px">Reference: <code>@requestId</code></p>
+}
+
+<a asp-controller="Dashboard" asp-action="Index" class="au-btn au-btn-primary auth-btn" style="text-decoration:none">
+    Back to Dashboard
+    <span class="arrow"><svg><use href="#i-arrow" /></svg></span>
+</a>
+<button type="button" class="au-btn au-btn-secondary auth-btn mt-3" style="height:48px" onclick="location.reload()">Try again</button>

@@ -1,0 +1,91 @@
+﻿/* LARGE DESKTOP */
+@media (min-width: 1400px) {
+
+    .auth-card {
+        margin-left: -214px;
+    }
+}
+
+
+/* LAPTOP */
+@media (min-width: 1024px) and (max-width: 1399px) {
+
+    .auth-card {
+        width: 900px;
+        margin-left: -100px;
+    }
+}
+
+
+/* TABLET */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+    .auth-card {
+        width: 100%;
+        max-width: 850px;
+        margin-left: 0;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        padding: 18px;
+    }
+
+    .auth-panel {
+        padding: 25px 18px;
+    }
+
+    .hero-art {
+        height: 180px;
+    }
+}
+
+
+/* MOBILE */
+@media (max-width: 767px) {
+
+    body {
+        padding: 15px;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 480px;
+        min-height: auto;
+        margin-left: 0;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .hero {
+        align-items: center;
+        text-align: center;
+        padding: 15px 10px;
+    }
+
+    .hero-art {
+        height: 160px;
+    }
+
+    .auth-panel {
+        padding: 25px 18px;
+    }
+}
+
+
+@media (max-width: 400px) {
+    .auth-card {
+        padding: 10px;
+        border-radius: 20px;
+    }
+    .hero-art {
+        height: 130px;
+    }
+
+    .hero h1 {
+        font-size: 21px;
+    }
+
+    .auth-panel {
+        padding: 20px 13px;
+    }
+}

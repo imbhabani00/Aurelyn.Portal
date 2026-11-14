@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Page not found";
+    ViewData["CardClass"] = "is-compact";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    var path = ViewData["RequestedPath"]?.ToString();
+}
+@section Hero {
+    <svg class="auth-art" viewBox="0 0 240 210" aria-hidden="true">
+        <circle cx="120" cy="105" r="95" fill="#e4e6ff" opacity=".55" />
+        <circle cx="106" cy="94" r="48" fill="url(#auGL)" stroke="url(#auG)" stroke-width="12" />
+        <path d="m142 130 42 42" stroke="url(#auG)" stroke-width="16" stroke-linecap="round" />
+        <text x="106" y="106" text-anchor="middle" font-size="30" font-weight="800" fill="#4f4bd0" font-family="Inter,Segoe UI,Arial,sans-serif">404</text>
+        <path d="M28 160h12M34 154v12M200 36h12M206 30v12" stroke="#a9a6ff" stroke-width="4" stroke-linecap="round" />
+    </svg>
+    <h1>Page <span>not found</span></h1>
+    <p>The page you're looking for has moved or doesn't exist.</p>
+}
+
+<h2 class="auth-title">404 · Not found</h2>
+<p class="auth-sub">
+    We couldn't find that page. Check the address or use the dashboard to find what you need.
+    @if (!string.IsNullOrEmpty(path))
+    {
+        <br /><code style="font-size:10px;word-break:break-all">@path</code>
+    }
+</p>
+
+<a asp-controller="Dashboard" asp-action="Index" class="au-btn au-btn-primary auth-btn" style="text-decoration:none">
+    Back to Dashboard
+    <span class="arrow"><svg><use href="#i-arrow" /></svg></span>
+</a>
+<button type="button" class="au-btn au-btn-secondary auth-btn mt-3" style="height:48px" onclick="history.length > 1 ? history.back() : (location.href='/')">Go back</button>

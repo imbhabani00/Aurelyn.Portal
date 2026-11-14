@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\Doctors\" />
+    <Folder Include="wwwroot\js\Appointments\" />
+    <Folder Include="wwwroot\js\MedicalHistory\" />
+    <Folder Include="wwwroot\js\Ambulances\" />
+    <Folder Include="wwwroot\js\LiveTracking\" />
+    <Folder Include="wwwroot\js\CareDesk\" />
+    <Folder Include="wwwroot\js\HelpSupport\" />
+    <Folder Include="wwwroot\js\Notifications\" />
+    <Folder Include="wwwroot\js\Roles\" />
+    <Folder Include="wwwroot\js\User\" />
+    <Folder Include="wwwroot\js\Reports\" />
+    <Folder Include="wwwroot\js\Payments\" />
+    <Folder Include="wwwroot\js\PharmacyStore\" />
+    <Folder Include="wwwroot\js\Patients\" />
+  </ItemGroup>
+
+</Project>

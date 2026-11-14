@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Server error";
+    ViewData["CardClass"] = "is-compact";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    var requestId = ViewData["RequestId"]?.ToString();
+}
+
+@section Hero {
+    <svg class="auth-art" viewBox="0 0 240 210" aria-hidden="true">
+        <circle cx="120" cy="105" r="95" fill="#ffe2e8" opacity=".55" />
+        <rect x="52" y="48" width="136" height="48" rx="14" fill="url(#auGL)" stroke="#c9ccf5" stroke-width="2" />
+        <rect x="52" y="108" width="136" height="48" rx="14" fill="url(#auGL)" stroke="#c9ccf5" stroke-width="2" />
+        <circle cx="76" cy="72" r="6" fill="#e45b70" />
+        <circle cx="76" cy="132" r="6" fill="#e9a23b" />
+        <path d="M100 72h64M100 132h64" stroke="#a9a6ff" stroke-width="5" stroke-linecap="round" />
+        <circle cx="178" cy="160" r="26" fill="#e45b70" />
+        <path d="M178 146v16" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+        <circle cx="178" cy="171" r="3.2" fill="#fff" />
+    </svg>
+    <h1>Server <span>error</span></h1>
+    <p>Something broke on our side. It isn't your fault.</p>
+}
+
+<h2 class="auth-title">500 · Server error</h2>
+<p class="auth-sub">We hit an unexpected problem and have logged it. Try again in a moment. If it keeps happening, contact support and quote the reference below.</p>
+@if (!string.IsNullOrEmpty(requestId))
+{
+    <p class="auth-sub" style="margin-top:-10px;font-size:10px">Reference: <code>@requestId</code></p>
+}
+
+<button type="button" class="au-btn au-btn-primary auth-btn" onclick="location.reload()">
+    <svg class="lead"><use href="#i-refresh" /></svg>&nbsp;Try again
+</button>
+<a asp-controller="Dashboard" asp-action="Index" class="au-btn au-btn-secondary auth-btn mt-3" style="text-decoration:none;height:48px">Back to Dashboard</a>

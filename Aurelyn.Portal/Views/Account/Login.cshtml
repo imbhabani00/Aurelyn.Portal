@@ -1,0 +1,635 @@
+﻿@model Aurelyn.Portal.Models.Account.LoginViewModel
+
+@{
+    ViewData["Title"] = "Sign in";
+    ViewData["CardClass"] = "is-login";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* ===== wider card + hero panel ===== */
+        .auth-card.is-login {
+            width: min(1120px, 100%);
+            min-height: 660px;
+            grid-template-columns: minmax(0,1.12fr) minmax(0,.88fr);
+            gap: 18px;
+            padding: 18px;
+            border-radius: 38px;
+            margin-left: 4px;
+        }
+
+        .is-login .auth-hero {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            padding: 28px 30px 32px;
+            border-radius: 30px;
+            background: linear-gradient(145deg, #101426 0%, #151b35 55%, #10172b 100%);
+            border: 1px solid rgba(129, 117, 255, .25);
+            box-shadow: inset 0 0 35px rgba(98, 91, 255, .08), 0 0 30px rgba(98, 91, 255, .08);
+        }
+
+            .is-login .auth-hero::before {
+                content: "";
+                position: absolute;
+                z-index: -1;
+                top: -120px;
+                right: -100px;
+                width: 360px;
+                height: 360px;
+                border-radius: 50%;
+                background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 70%);
+            }
+
+        .lg-wave {
+            position: absolute;
+            z-index: -1;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            pointer-events: none;
+        }
+
+        .lg-stage {
+            position: relative;
+            flex: 1;
+            display: grid;
+            place-items: center;
+            min-height: 310px;
+            margin: 4px 0 6px;
+        }
+
+        .lg-art {
+            width: min(100%, 440px);
+            height: auto;
+            filter: drop-shadow(0 18px 28px rgba(110, 95, 255, .25));
+            animation: lgFloat 7s ease-in-out infinite;
+        }
+
+        .lg-chip {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 15px 9px 10px;
+            border-radius: 17px;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+            animation: lgFloat 5.5s ease-in-out infinite;
+            border: 1px solid rgba(129, 117, 255, .30);
+            background: linear-gradient(145deg, #1b2340, #121a30);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .35);
+            color: #f0f1ff;
+        }
+
+            .lg-chip i {
+                width: 30px;
+                height: 30px;
+                display: grid;
+                place-items: center;
+                border-radius: 10px;
+                color: var(--au-primary);
+                background: #e9eaff;
+                box-shadow: inset 2px 2px 5px #d3d6f5, inset -2px -2px 5px #fff;
+            }
+
+            .lg-chip svg {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 1.9;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+            .lg-chip small {
+                display: block;
+                margin-top: 1px;
+                font-size: 9px;
+                font-weight: 600;
+                color: var(--au-muted);
+            }
+
+            .lg-chip.c1 {
+                top: 4%;
+                right: -4px;
+                animation-delay: -1s;
+            }
+
+            .lg-chip.c2 {
+                bottom: 14%;
+                left: -6px;
+                animation-delay: -2.6s;
+            }
+
+            .lg-chip.c3 {
+                bottom: 0;
+                right: 2%;
+                animation-delay: -4.2s;
+            }
+
+        .is-login .auth-hero h1 {
+            font-size: 36px;
+        }
+
+        .is-login .auth-hero p {
+            max-width: 360px;
+            font-size: 13px;
+        }
+
+        /* ===== form panel ===== */
+        .is-login .auth-panel {
+            padding: 38px 40px 28px;
+            border-radius: 30px;
+        }
+
+        .is-login .auth-title {
+            text-align: left;
+            font-size: 26px;
+            letter-spacing: -.4px;
+        }
+
+        .is-login .auth-sub {
+            text-align: left;
+            margin-bottom: 22px;
+        }
+
+        .is-login .auth-pane.active {
+            animation: lgIn .35s ease;
+        }
+
+        .lg-hint {
+            margin: -6px 2px 16px;
+            font-size: 10px;
+            color: var(--au-muted);
+        }
+
+        .lg-terms {
+            margin: 14px 4px 0;
+            text-align: center;
+            font-size: 10px;
+            line-height: 1.6;
+            color: var(--au-muted);
+        }
+
+        .lg-secure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: auto;
+            padding-top: 22px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--au-muted);
+        }
+
+            .lg-secure svg {
+                width: 14px;
+                height: 14px;
+                stroke: #20ad8a;
+                fill: none;
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+        /* ===== fit to screen on laptop / desktop (no page scroll) ===== */
+        @@media (min-width: 961px) {
+            html, body {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .auth-page {
+                height: 100vh;
+                height: 100dvh;
+                min-height: 0;
+                padding: 16px;
+            }
+
+            .auth-card.is-login {
+                height: 100%;
+                max-height: 720px;
+                min-height: 0;
+            }
+
+            .is-login .auth-hero {
+                min-height: 0;
+                padding: clamp(18px,3.2vh,28px) clamp(20px,2.4vw,30px);
+            }
+
+            .lg-stage {
+                min-height: 0;
+                margin: 0;
+            }
+
+            .lg-art {
+                width: auto;
+                max-width: 100%;
+                height: min(46vh, 380px);
+            }
+
+            .is-login .auth-hero h1 {
+                font-size: clamp(26px, 4.6vh, 36px);
+            }
+
+            .is-login .auth-panel {
+                padding: clamp(18px,3.4vh,38px) clamp(24px,3vw,40px) clamp(14px,2vh,26px);
+            }
+
+            .is-login .auth-tabs {
+                margin-bottom: clamp(12px,2.2vh,22px);
+            }
+
+            .is-login .auth-title {
+                font-size: clamp(21px, 3.4vh, 26px);
+            }
+
+            .is-login .auth-sub {
+                margin-bottom: clamp(10px,2.2vh,22px);
+            }
+
+            .is-login .auth-field {
+                margin-bottom: clamp(10px,1.9vh,16px);
+            }
+
+                .is-login .auth-field .au-input {
+                    height: clamp(40px, 5.8vh, 48px);
+                }
+
+            .is-login .auth-btn {
+                height: clamp(42px, 6vh, 50px);
+            }
+
+            .is-login .auth-btn-google {
+                height: clamp(40px, 5.6vh, 48px);
+            }
+
+            .is-login .auth-divider {
+                margin: clamp(10px,1.8vh,16px) 0;
+            }
+
+            .is-login .auth-foot {
+                margin-top: clamp(10px,1.8vh,18px);
+            }
+
+            .lg-secure {
+                padding-top: clamp(10px,1.8vh,22px);
+            }
+        }
+
+        @@media (min-width: 961px) and (max-height: 760px) {
+            .is-login .auth-hero p, .lg-hint, .lg-terms {
+                display: none;
+            }
+
+            .lg-chip {
+                padding: 6px 12px 6px 8px;
+            }
+        }
+
+        @@media (min-width: 961px) and (max-height: 600px) {
+            html, body {
+                overflow: auto;
+            }
+
+            .auth-page {
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .auth-card.is-login {
+                height: auto;
+            }
+        }
+
+        @@keyframes lgFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @@keyframes lgIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            .lg-art, .lg-chip, .is-login .auth-pane.active {
+                animation: none;
+            }
+        }
+
+        @@media (max-width: 960px) {
+            .auth-card.is-login {
+                grid-template-columns: 1fr;
+                min-height: 0;
+            }
+
+            .is-login .auth-hero {
+                align-items: center;
+                padding: 22px 20px 26px;
+                text-align: center;
+            }
+
+            .lg-stage {
+                min-height: 0;
+            }
+
+            .lg-art {
+                width: min(100%, 300px);
+            }
+
+            .lg-chip {
+                display: none;
+            }
+
+            .is-login .auth-hero h1 {
+                font-size: 27px;
+            }
+
+            .is-login .auth-hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .auth-card.is-login {
+                padding: 10px;
+                border-radius: 26px;
+            }
+
+            .is-login .auth-panel {
+                padding: 26px 18px 22px;
+            }
+
+            .is-login .auth-hero p {
+                display: none;
+            }
+
+            .lg-art {
+                width: 230px;
+            }
+        }
+    </style>
+}
+
+@section Hero {
+    <svg class="lg-wave" viewBox="0 0 600 150" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 70C120 20 220 120 340 80S520 30 600 70V150H0Z" fill="#27345f" opacity=".35" />
+        <path d="M0 105C130 65 240 140 360 108S530 72 600 100V150H0Z" fill="#8175ff" opacity=".20" />
+    </svg>
+
+    <div class="lg-stage">
+        <svg class="lg-art" viewBox="0 0 440 380" role="img" aria-label="Stethoscope and heart illustration">
+            <defs>
+                <linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9f9bff" /><stop offset="1" stop-color="#4b47cc" /></linearGradient>
+                <linearGradient id="lgH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#aeaaff" /><stop offset="1" stop-color="#5f5be4" /></linearGradient>
+                <linearGradient id="lgD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f9ff" /><stop offset="1" stop-color="#e0e3ff" /></linearGradient>
+                <linearGradient id="lgM" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" /><stop offset="1" stop-color="#c9cdf2" /></linearGradient>
+                <filter id="lgB" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14" /></filter>
+            </defs>
+
+            <!-- neumorphic disc -->
+            <circle cx="196" cy="172" r="150" fill="#fff" filter="url(#lgB)" />
+            <circle cx="232" cy="210" r="150" fill="#b4b9e8" opacity=".75" filter="url(#lgB)" />
+            <circle cx="214" cy="190" r="150" fill="url(#lgD)" />
+            <circle cx="214" cy="190" r="120" fill="none" stroke="#fff" stroke-width="3" opacity=".8" />
+
+            <!-- stethoscope -->
+            <path d="M118 74V150a35 35 0 0 0 70 0V74" fill="none" stroke="url(#lgP)" stroke-width="9" stroke-linecap="round" />
+            <rect x="109" y="48" width="18" height="30" rx="9" fill="url(#lgM)" stroke="#8d89ee" stroke-width="2" />
+            <rect x="179" y="48" width="18" height="30" rx="9" fill="url(#lgM)" stroke="#8d89ee" stroke-width="2" />
+            <path d="M153 185V214C153 276 215 292 250 264" fill="none" stroke="url(#lgP)" stroke-width="8" stroke-linecap="round" />
+            <circle cx="264" cy="254" r="31" fill="url(#lgM)" stroke="url(#lgP)" stroke-width="7" />
+            <circle cx="264" cy="254" r="16" fill="#fff" stroke="#8d89ee" stroke-width="2" />
+            <circle cx="264" cy="254" r="5" fill="#6360e6" />
+
+            <!-- heart -->
+            <g transform="translate(-14 0)">
+                <path d="M300 214C238 172 232 112 268 104 288 100 299 114 300 122 301 114 312 100 332 104 368 112 362 172 300 214Z" fill="url(#lgH)" />
+                <ellipse cx="268" cy="128" rx="14" ry="7" transform="rotate(-38 268 128)" fill="#fff" opacity=".28" />
+                <path d="M246 156h26l10-30 18 62 13-34h28" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+
+            <!-- sparkles -->
+            <g stroke="#a9a6ff" stroke-width="5" stroke-linecap="round" fill="none">
+                <path d="M62 120h16M70 112v16" /><path d="M356 58h16M364 50v16" /><path d="M52 262h12M58 256v12" /><path d="M376 300h14M383 293v14" /><path d="M96 332h10M101 327v10" />
+            </g>
+            <circle cx="330" cy="40" r="5" fill="#c4c1ff" />
+            <circle cx="40" cy="190" r="4" fill="#c4c1ff" />
+            <circle cx="400" cy="200" r="4" fill="#c4c1ff" />
+        </svg>
+
+        <div class="lg-chip c1">
+            <i><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></svg></i>
+            <span>Book appointments<small>In just a few taps</small></span>
+        </div>
+        <div class="lg-chip c2">
+            <i><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></svg></i>
+            <span>Verified doctors<small>Trusted specialists</small></span>
+        </div>
+        <div class="lg-chip c3">
+            <i><svg viewBox="0 0 24 24"><path d="M3 13v-2a9 9 0 0 1 18 0v2" /><path d="M5 13h2v6H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2ZM19 13h-2v6h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2ZM17 20a5 5 0 0 1-5 2" /></svg></i>
+            <span>Care Desk 24×7<small>Always here for you</small></span>
+        </div>
+    </div>
+
+    <h1>Better Care. <span>A Healthier You.</span></h1>
+    <p>Book appointments, consult doctors and manage your health — all in one place.</p>
+}
+
+<!-- AUTH TABS -->
+<div class="auth-tabs" role="tablist">
+    <button type="button" class="auth-tab active" role="tab" aria-selected="true" onclick="showAuthTab('signin', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-lock"></use></svg>
+        Sign in
+    </button>
+    <button type="button" class="auth-tab" role="tab" aria-selected="false" onclick="showAuthTab('signup', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-userplus"></use></svg>
+        Sign up
+    </button>
+</div>
+
+<!-- SIGN IN -->
+<div id="signin" class="auth-pane active">
+    <h2 class="auth-title">Welcome Back!</h2>
+    <p class="auth-sub">Sign in to your <strong>Aurelyn Care</strong> account</p>
+
+    <form asp-controller="Account" asp-action="Login" method="post" id="loginForm" data-auth-form novalidate>
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="auth-field">
+            <svg class="f-icon" viewBox="0 0 24 24"><use href="#i-mail"></use></svg>
+            <input asp-for="Email" type="email" class="au-input" placeholder="Email address" autocomplete="username" data-label="Email address" required />
+        </div>
+
+        <div class="auth-field">
+            <svg class="f-icon" viewBox="0 0 24 24"><use href="#i-lock"></use></svg>
+            <input asp-for="Password" type="password" id="loginPassword" class="au-input" placeholder="Password" autocomplete="current-password" data-label="Password" required />
+            <button type="button" class="pw-toggle" onclick="toggleAuthPassword('loginPassword', this)" aria-label="Show password">
+                <svg class="eye-on" viewBox="0 0 24 24"><use href="#i-eye-on"></use></svg>
+                <svg class="eye-off" viewBox="0 0 24 24"><use href="#i-eye-off"></use></svg>
+            </button>
+        </div>
+
+        <div class="auth-row">
+            <label class="auth-check">
+                @* <input type="checkbox" name="RememberMe" value="true" />
+                <span>Remember me</span> *@
+            </label>
+            <a asp-controller="Account" asp-action="ResetPassword" class="auth-link">
+                Forgot password?
+            </a>
+        </div>
+
+        <button type="submit" id="loginBtn" class="au-btn au-btn-primary auth-btn">
+            <span>Sign in</span>
+            <span class="arrow"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></span>
+        </button>
+    </form>
+
+    <div class="auth-divider">or continue with</div>
+
+    <button type="button" class="au-btn au-btn-secondary auth-btn-google"
+            onclick="showInfo('Google sign-in is not enabled yet.')">
+        <svg viewBox="0 0 24 24"><use href="#i-google"></use></svg>
+        Continue with Google
+    </button>
+
+    <div class="auth-foot">
+        Don't have an account?
+        <button type="button" class="auth-link" onclick="showAuthTab('signup', document.querySelectorAll('.auth-tab')[1])">Sign up</button>
+    </div>
+</div>
+
+<!-- SIGN UP -->
+<div id="signup" class="auth-pane">
+    <h2 class="auth-title">Create Account</h2>
+    <p class="auth-sub">Join <strong>Aurelyn Care</strong> and manage your health.</p>
+
+    <form asp-controller="Account" asp-action="Register" method="post" id="registerForm" novalidate>
+        <div class="auth-name-row">
+            <div class="auth-field">
+                <svg class="f-icon" viewBox="0 0 24 24"><use href="#i-user"></use></svg>
+                <input type="text" name="FirstName" class="au-input" placeholder="First name" autocomplete="given-name" data-label="First name" required />
+            </div>
+            <div class="auth-field no-icon">
+                <input type="text" name="LastName" class="au-input" placeholder="Last name" autocomplete="family-name" data-label="Last name" required />
+            </div>
+        </div>
+
+        <div class="auth-field">
+            <svg class="f-icon" viewBox="0 0 24 24"><use href="#i-mail"></use></svg>
+            <input type="email" name="Email" class="au-input" placeholder="Email address" autocomplete="email" data-label="Email address" required />
+        </div>
+
+        <div class="auth-field">
+            <svg class="f-icon" viewBox="0 0 24 24"><use href="#i-lock"></use></svg>
+            <input type="password" id="signupPassword" name="Password" class="au-input" placeholder="Create password" autocomplete="new-password" data-label="Password" required />
+            <button type="button" class="pw-toggle" onclick="toggleAuthPassword('signupPassword', this)" aria-label="Show password">
+                <svg class="eye-on" viewBox="0 0 24 24"><use href="#i-eye-on"></use></svg>
+                <svg class="eye-off" viewBox="0 0 24 24"><use href="#i-eye-off"></use></svg>
+            </button>
+        </div>
+
+        <div class="auth-field">
+            <svg class="f-icon" viewBox="0 0 24 24"><use href="#i-lock"></use></svg>
+            <input type="password" id="confirmPassword" name="ConfirmPassword" class="au-input" placeholder="Confirm password" autocomplete="new-password" data-match="#signupPassword" data-label="Confirm password" required />
+            <button type="button" class="pw-toggle" onclick="toggleAuthPassword('confirmPassword', this)" aria-label="Show password">
+                <svg class="eye-on" viewBox="0 0 24 24"><use href="#i-eye-on"></use></svg>
+                <svg class="eye-off" viewBox="0 0 24 24"><use href="#i-eye-off"></use></svg>
+            </button>
+        </div>
+        <p class="lg-hint">Use 8+ characters with a mix of letters, numbers and symbols.</p>
+
+        <button type="submit" class="au-btn au-btn-primary auth-btn">
+            <span>Create account</span>
+            <span class="arrow"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></span>
+        </button>
+        <p class="lg-terms">By creating an account you agree to our Terms of Service and Privacy Policy.</p>
+    </form>
+
+    <div class="auth-foot">
+        Already have an account?
+        <button type="button" class="auth-link" onclick="showAuthTab('signin', document.querySelectorAll('.auth-tab')[0])">Sign in</button>
+    </div>
+</div>
+
+<div class="lg-secure">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></svg>
+    Your data is encrypted and secure
+</div>
+
+
+@section Scripts {
+    <script src="~/js/auth/register.js" asp-append-version="true"></script>
+    <script src="~/js/auth/login.js" asp-append-version="true"></script>
+    <script>
+        function showAuthTab(tabId, button) {
+
+            document.querySelectorAll('.auth-pane').forEach(function (p) {
+                p.classList.remove('active');
+            });
+
+            document.querySelectorAll('.auth-tab').forEach(function (t) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+
+            var pane = document.getElementById(tabId);
+
+            if (pane) {
+                pane.classList.add('active');
+            }
+
+            if (button) {
+                button.classList.add('active');
+                button.setAttribute('aria-selected', 'true');
+            }
+        }
+
+        function toggleAuthPassword(inputId, button) {
+
+            var input = document.getElementById(inputId);
+
+            if (!input) return;
+
+            var isPassword = input.type === 'password';
+
+            input.type = isPassword ? 'text' : 'password';
+
+            button.classList.toggle('password-visible', isPassword);
+
+            button.setAttribute(
+                'aria-label',
+                isPassword ? 'Hide password' : 'Show password'
+            );
+        }
+
+        $(function () {
+
+            if (location.hash === '#signup') {
+                showAuthTab('signup', document.querySelectorAll('.auth-tab')[1]);
+            }
+
+        });
+    </script>
+}

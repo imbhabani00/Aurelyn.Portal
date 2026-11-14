@@ -1,0 +1,861 @@
+﻿
+/* =========================================================
+   AURELYN CARE — PREMIUM DARK THEME
+   Midnight Black + Electric Purple + Deep Blue
+   ========================================================= */
+
+:root {
+    color-scheme: dark;
+    /* Main backgrounds */
+    --au-bg: #080B14;
+    --au-surface: #111729;
+    --au-white: #171F35;
+    /* Brand colors */
+    --au-primary: #756BFF;
+    --au-primary-dark: #6255E8;
+    --au-primary-light: #A49BFF;
+    /* Text */
+    --au-text: #F2F3FF;
+    --au-muted: #A0A9C5;
+    /* Status */
+    --au-success: #31D6A0;
+    --au-danger: #FF647C;
+    --au-warning: #FFC36B;
+    /* Borders and shadows */
+    --au-line: rgba(133, 145, 210, .20);
+    --au-shadow: 0 18px 45px rgba(0, 0, 0, .42), 0 0 24px rgba(100, 86, 255, .08);
+    --au-shadow-small: 0 7px 20px rgba(0, 0, 0, .35), 0 0 12px rgba(100, 86, 255, .07);
+    --au-inset: inset 0 1px 0 rgba(255,255,255,.035), inset 0 0 18px rgba(48, 75, 150, .08);
+    --au-radius: 20px;
+    --au-radius-lg: 28px;
+}
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+html,
+body {
+    background: var(--au-bg);
+    color: var(--au-text);
+}
+
+body {
+    background: radial-gradient( circle at 15% 10%, rgba(94, 73, 255, .12), transparent 32% ), radial-gradient( circle at 85% 85%, rgba(34, 83, 190, .10), transparent 35% ), var(--au-bg);
+}
+
+h1, h2, h3, h4, h5, h6,
+p, span, label, small {
+    color: inherit;
+}
+
+a {
+    color: var(--au-primary-light);
+}
+
+    a:hover {
+        color: #C0BAFF;
+    }
+
+hr {
+    border-color: var(--au-line);
+    opacity: 1;
+}
+
+/* =========================================================
+   COMMON CARDS
+   ========================================================= */
+
+.au-card,
+.card,
+.au-stat-card,
+.au-widget,
+.au-panel {
+    color: var(--au-text);
+    background: linear-gradient( 145deg, #17213B, #111729 );
+    border: 1px solid #303D68;
+    border-radius: var(--au-radius);
+    box-shadow: var(--au-shadow);
+}
+
+.au-card-inset {
+    background: #0D1425;
+    border: 1px solid #273453;
+    box-shadow: var(--au-inset);
+}
+
+.au-card-title {
+    color: #F1F2FF;
+}
+
+.au-page-header h1,
+.au-page-header h2,
+.au-page-header h3 {
+    color: #F4F4FF;
+}
+
+.au-page-header p,
+.au-page-header .text-muted {
+    color: var(--au-muted) !important;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.au-btn {
+    border-radius: 13px;
+    transition: all .25s ease;
+}
+
+.au-btn-primary,
+.btn-primary {
+    color: #fff !important;
+    background: linear-gradient( 115deg, #796CFF, #5149D9 ) !important;
+    border: 1px solid #9187FF !important;
+    box-shadow: 0 8px 22px rgba(99, 82, 255, .30), inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+    .au-btn-primary:hover,
+    .btn-primary:hover {
+        color: #fff !important;
+        background: linear-gradient( 115deg, #9187FF, #655BEE ) !important;
+        box-shadow: 0 10px 28px rgba(99, 82, 255, .42);
+        transform: translateY(-1px);
+    }
+
+.au-btn-secondary,
+.btn-secondary {
+    color: #DCE4FF !important;
+    background: #17223B !important;
+    border: 1px solid #3A4A78 !important;
+}
+
+    .au-btn-secondary:hover,
+    .btn-secondary:hover {
+        background: #202E50 !important;
+        border-color: #746BFF !important;
+    }
+
+.au-btn-outline,
+.btn-outline-primary {
+    color: var(--au-primary-light) !important;
+    background: transparent !important;
+    border: 1px solid #746BFF !important;
+}
+
+    .au-btn-outline:hover,
+    .btn-outline-primary:hover {
+        color: #fff !important;
+        background: rgba(117, 107, 255, .17) !important;
+    }
+
+/* =========================================================
+   INPUTS / SELECTS / TEXTAREA
+   ========================================================= */
+
+.au-input,
+.au-select,
+.au-textarea,
+input.form-control,
+select.form-select,
+textarea.form-control,
+.form-control,
+.form-select {
+    color: #F2F3FF !important;
+    background: #0B1222 !important;
+    border: 1px solid #35436D !important;
+    border-radius: 12px;
+    box-shadow: inset 0 2px 7px rgba(0,0,0,.25), 0 0 0 1px rgba(100, 115, 180, .04);
+}
+
+    .au-input::placeholder,
+    .au-textarea::placeholder,
+    .form-control::placeholder {
+        color: #7783A5 !important;
+        opacity: 1;
+    }
+
+    .au-input:focus,
+    .au-select:focus,
+    .au-textarea:focus,
+    .form-control:focus,
+    .form-select:focus {
+        color: #fff !important;
+        background: #101A31 !important;
+        border-color: #8175FF !important;
+        box-shadow: 0 0 0 3px rgba(117, 107, 255, .17), 0 0 18px rgba(117, 107, 255, .10) !important;
+        outline: none;
+    }
+
+    .form-select option,
+    .au-select option {
+        color: #F2F3FF;
+        background: #111729;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled,
+    .form-control:disabled {
+        color: #8791AD !important;
+        background: #171E30 !important;
+    }
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.au-search-box,
+.au-search {
+    color: #E9ECFF;
+    background: #0D1425;
+    border: 1px solid #34436D;
+}
+
+    .au-search-box input,
+    .au-search input {
+        color: #F2F3FF;
+        background: transparent;
+    }
+
+        .au-search-box input::placeholder,
+        .au-search input::placeholder {
+            color: #8791AD;
+        }
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+.au-table,
+.table {
+    color: #E9ECFF;
+    --bs-table-color: #E9ECFF;
+    --bs-table-bg: transparent;
+    --bs-table-border-color: #2A3555;
+    --bs-table-striped-bg: rgba(68, 85, 145, .10);
+    --bs-table-hover-bg: rgba(117, 107, 255, .10);
+}
+
+    .au-table thead th,
+    .table thead th {
+        color: #B8C3E8;
+        background: #18233D;
+        border-color: #34436D;
+    }
+
+    .au-table tbody td,
+    .table tbody td {
+        color: #E0E5FA;
+        border-color: #293553;
+    }
+
+    .au-table tbody tr:hover,
+    .table tbody tr:hover {
+        color: #fff;
+        background: rgba(117, 107, 255, .08);
+    }
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: #E9ECFF;
+    background-color: rgba(69, 83, 140, .08);
+}
+
+/* =========================================================
+   BADGES / STATUS
+   ========================================================= */
+
+.au-badge,
+.badge {
+    border: 1px solid transparent;
+}
+
+    .au-badge-success,
+    .badge.bg-success {
+        color: #61E8BC !important;
+        background: rgba(31, 190, 139, .14) !important;
+        border-color: rgba(49, 214, 160, .28);
+    }
+
+    .au-badge-danger,
+    .badge.bg-danger {
+        color: #FF8294 !important;
+        background: rgba(255, 80, 110, .13) !important;
+        border-color: rgba(255, 100, 124, .25);
+    }
+
+    .au-badge-warning,
+    .badge.bg-warning {
+        color: #FFD28A !important;
+        background: rgba(255, 183, 76, .13) !important;
+        border-color: rgba(255, 195, 107, .25);
+    }
+
+    .au-badge-primary,
+    .badge.bg-primary {
+        color: #BDB7FF !important;
+        background: rgba(117, 107, 255, .16) !important;
+        border-color: rgba(117, 107, 255, .30);
+    }
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.pagination .page-link {
+    color: #C7CCEA;
+    background: #151E34;
+    border-color: #34436D;
+}
+
+    .pagination .page-link:hover {
+        color: #fff;
+        background: #28345B;
+    }
+
+.pagination .page-item.active .page-link {
+    color: #fff;
+    background: #655BEE;
+    border-color: #8175FF;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #69738F;
+    background: #101729;
+}
+
+/* =========================================================
+   EMPTY STATES / SPINNERS
+   ========================================================= */
+
+.au-empty-state {
+    color: var(--au-muted);
+    background: #111A2D;
+    border: 1px dashed #3A4770;
+}
+
+.au-spinner {
+    border-color: #35436D;
+    border-top-color: var(--au-primary);
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.au-shell {
+    color: var(--au-text);
+    background: var(--au-bg);
+}
+
+.au-sidebar {
+    color: var(--au-text);
+    background: linear-gradient( 180deg, #11182B 0%, #0B1120 100% );
+    border-right: 1px solid #293655;
+    box-shadow: 12px 0 35px rgba(0,0,0,.25);
+}
+
+.au-brand-name {
+    color: #F4F3FF;
+}
+
+.au-brand-sub {
+    color: #929DBD;
+}
+
+.au-brand-mark {
+    color: #fff;
+    background: linear-gradient( 135deg, #8175FF, #394FBA );
+    box-shadow: 0 0 22px rgba(117,107,255,.30);
+}
+
+.au-nav-label {
+    color: #7481A6;
+}
+
+.au-nav-link {
+    color: #AEB8D6;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all .2s ease;
+}
+
+    .au-nav-link svg {
+        color: #929FC6;
+        stroke: currentColor;
+    }
+
+    .au-nav-link:hover {
+        color: #fff;
+        background: rgba(105, 101, 255, .12);
+        border-color: rgba(117,107,255,.22);
+    }
+
+        .au-nav-link:hover svg {
+            color: #A99FFF;
+        }
+
+    .au-nav-link.active {
+        color: #fff;
+        background: linear-gradient( 110deg, rgba(117,107,255,.30), rgba(55,84,174,.20) );
+        border: 1px solid rgba(130,120,255,.42);
+        box-shadow: 0 5px 18px rgba(70,60,190,.16), inset 0 0 15px rgba(117,107,255,.07);
+    }
+
+        .au-nav-link.active svg {
+            color: #B5ACFF;
+        }
+
+.au-sidebar-bottom {
+    border-top: 1px solid #293655;
+}
+
+.au-logout-link {
+    color: #AAB4D2;
+}
+
+    .au-logout-link:hover {
+        color: #FF8798;
+        background: rgba(255,90,115,.10);
+    }
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.au-topbar {
+    color: var(--au-text);
+    background: linear-gradient( 110deg, #11182B, #141C32 );
+    border-bottom: 1px solid #293655;
+    box-shadow: 0 5px 22px rgba(0,0,0,.18);
+}
+
+.au-menu-toggle,
+.au-icon-btn {
+    color: #C2C8E5;
+    background: #18233D;
+    border: 1px solid #35436D;
+}
+
+    .au-menu-toggle:hover,
+    .au-icon-btn:hover {
+        color: #fff;
+        background: #26345A;
+        border-color: #8175FF;
+    }
+
+.au-user-button {
+    color: #E8EAFF;
+    background: #18233D;
+    border: 1px solid #35436D;
+}
+
+    .au-user-button:hover {
+        background: #202D4D;
+        border-color: #8175FF;
+    }
+
+.au-avatar {
+    color: #fff;
+    background: linear-gradient( 135deg, #8175FF, #394FBA );
+    box-shadow: 0 0 16px rgba(117,107,255,.22);
+}
+
+/* =========================================================
+   DROPDOWN
+   ========================================================= */
+
+.au-user-dropdown,
+.dropdown-menu {
+    color: #E9ECFF;
+    background: #151E34;
+    border: 1px solid #35436D;
+    box-shadow: 0 15px 40px rgba(0,0,0,.42);
+}
+
+.au-dropdown-item,
+.dropdown-item {
+    color: #D0D7F2;
+}
+
+    .au-dropdown-item:hover,
+    .dropdown-item:hover {
+        color: #fff;
+        background: rgba(117,107,255,.14);
+    }
+
+.dropdown-divider {
+    border-color: #35436D;
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.au-modal-backdrop,
+.modal-backdrop {
+    background: rgba(0,0,0,.72);
+}
+
+.au-modal-box,
+.modal-content {
+    color: #F0F2FF;
+    background: linear-gradient( 145deg, #19233C, #11182B );
+    border: 1px solid #3A4773;
+    border-radius: 20px;
+    box-shadow: 0 22px 65px rgba(0,0,0,.55), 0 0 25px rgba(117,107,255,.08);
+}
+
+.au-modal-header,
+.modal-header {
+    border-bottom: 1px solid #35436D;
+}
+
+    .au-modal-header h5,
+    .modal-title {
+        color: #F3F2FF;
+    }
+
+.au-modal-close {
+    color: #B8BFE0;
+    background: #202B48;
+    border: 1px solid #3B4A75;
+}
+
+    .au-modal-close:hover {
+        color: #fff;
+        background: #34436D;
+    }
+
+.modal-footer {
+    border-top: 1px solid #35436D;
+}
+
+/* =========================================================
+   AUTHENTICATION PAGES
+   ========================================================= */
+
+.auth-page {
+    background: radial-gradient( circle at 15% 20%, rgba(104, 79, 255, .18), transparent 35% ), radial-gradient( circle at 90% 80%, rgba(35, 91, 190, .15), transparent 35% );
+}
+
+.auth-card {
+    color: var(--au-text);
+    background: linear-gradient( 145deg, #151D33, #0D1425 ) !important;
+    border: 1px solid #394773 !important;
+    box-shadow: 0 25px 70px rgba(0,0,0,.55), 0 0 35px rgba(117,107,255,.12) !important;
+}
+
+.auth-hero {
+    color: #F3F2FF;
+    background: linear-gradient( 150deg, #172344, #10182D ) !important;
+    border: 1px solid #344575;
+    box-shadow: inset 0 0 35px rgba(79,91,180,.12);
+}
+
+    .auth-hero h1 {
+        color: #F5F3FF;
+    }
+
+        .auth-hero h1 span {
+            color: #A99FFF !important;
+        }
+
+    .auth-hero p {
+        color: #A8B3D3 !important;
+    }
+
+.auth-panel {
+    color: #F0F2FF;
+    background: linear-gradient( 145deg, #18223A, #11192C ) !important;
+    border: 1px solid #3B4A75 !important;
+    box-shadow: var(--au-shadow) !important;
+}
+
+.auth-title {
+    color: #F4F3FF;
+}
+
+.auth-sub {
+    color: #A4AFCE !important;
+}
+
+    .auth-sub strong {
+        color: #B2A9FF !important;
+    }
+
+.auth-tabs {
+    background: #0C1426 !important;
+    border: 1px solid #303D65;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,.3) !important;
+}
+
+.auth-tab {
+    color: #AEB8D7 !important;
+}
+
+    .auth-tab:hover {
+        color: #fff !important;
+        background: rgba(117,107,255,.10);
+    }
+
+    .auth-tab.active {
+        color: #fff !important;
+        background: linear-gradient( 110deg, #8175FF, #5149D9 ) !important;
+        box-shadow: 0 5px 18px rgba(91,76,225,.32) !important;
+    }
+
+.auth-field .f-icon,
+.pw-toggle svg {
+    stroke: #A99FFF !important;
+}
+
+.auth-field .au-input {
+    color: #F3F3FF !important;
+    background: #0B1222 !important;
+    border: 1px solid #3A4773 !important;
+}
+
+    .auth-field .au-input:focus {
+        background: #111C34 !important;
+        border-color: #8175FF !important;
+        box-shadow: 0 0 0 3px rgba(117,107,255,.16) !important;
+    }
+
+.pw-toggle:hover {
+    background: rgba(117,107,255,.10);
+    border-radius: 9px;
+}
+
+.auth-check {
+    color: #C6CDE5;
+}
+
+    .auth-check input {
+        background: #0B1222 !important;
+        border: 1px solid #3A4773;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,.30) !important;
+    }
+
+        .auth-check input:checked {
+            background: #7165F4 !important;
+            border-color: #A197FF;
+            box-shadow: 0 0 12px rgba(117,107,255,.35) !important;
+        }
+
+.auth-link,
+.auth-back {
+    color: #A99FFF !important;
+}
+
+    .auth-link:hover,
+    .auth-back:hover {
+        color: #D0CAFF !important;
+    }
+
+.auth-btn .arrow {
+    color: #8175FF !important;
+    background: #E8E6FF !important;
+}
+
+.auth-btn-google {
+    color: #E8EBFF !important;
+    background: #17223B !important;
+    border: 1px solid #3C4A74 !important;
+}
+
+    .auth-btn-google:hover {
+        background: #223153 !important;
+        border-color: #8175FF !important;
+    }
+
+.auth-divider {
+    color: #8995B8 !important;
+}
+
+    .auth-divider::before,
+    .auth-divider::after {
+        background: #34416A !important;
+    }
+
+.auth-foot {
+    color: #AEB8D5;
+}
+
+.auth-back {
+    color: #A99FFF !important;
+}
+
+.otp-box {
+    color: #fff !important;
+    background: #0B1222 !important;
+    border: 1px solid #3D4B78 !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,.28) !important;
+}
+
+    .otp-box:focus {
+        background: #151E38 !important;
+        border-color: #958BFF !important;
+        box-shadow: 0 0 0 3px rgba(117,107,255,.17) !important;
+    }
+
+.otp-resend {
+    color: #C2C9E5;
+}
+
+    .otp-resend svg {
+        stroke: #A99FFF !important;
+    }
+
+    .otp-resend button:disabled {
+        color: #75809E !important;
+    }
+
+.code-input {
+    color: #fff !important;
+}
+
+/* =========================================================
+   LOGIN PAGE SPECIAL ELEMENTS
+   ========================================================= */
+
+.is-login .auth-hero {
+    background: linear-gradient( 150deg, #172344 0%, #10172B 100% ) !important;
+}
+
+    .is-login .auth-hero::before {
+        background: radial-gradient( circle, rgba(117,107,255,.22) 0%, transparent 70% ) !important;
+    }
+
+.lg-chip {
+    color: #E9EAFF !important;
+    background: linear-gradient( 145deg, #1B2948, #111A30 ) !important;
+    border: 1px solid #465587 !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35) !important;
+}
+
+    .lg-chip i {
+        color: #B0A7FF !important;
+        background: #25345C !important;
+        box-shadow: inset 0 0 12px rgba(117,107,255,.12) !important;
+    }
+
+    .lg-chip small {
+        color: #9CA9CB !important;
+    }
+
+.lg-hint,
+.lg-terms,
+.lg-secure {
+    color: #9CA8C9 !important;
+}
+
+    .lg-secure svg {
+        stroke: #31D6A0 !important;
+    }
+
+/* =========================================================
+   BOOTSTRAP / VALIDATION
+   ========================================================= */
+
+.text-muted {
+    color: #96A1C0 !important;
+}
+
+.form-label,
+label {
+    color: #DCE2FA;
+}
+
+.form-check-input {
+    background-color: #0B1222;
+    border-color: #46547C;
+}
+
+    .form-check-input:checked {
+        background-color: #7165F4;
+        border-color: #8175FF;
+    }
+
+.alert {
+    color: #E9ECFF;
+    background: #17223B;
+    border: 1px solid #3A4A75;
+}
+
+.alert-success {
+    color: #75E8C2;
+    background: rgba(31,190,139,.12);
+    border-color: rgba(49,214,160,.28);
+}
+
+.alert-danger {
+    color: #FF91A1;
+    background: rgba(255,80,110,.12);
+    border-color: rgba(255,100,124,.28);
+}
+
+.validation-summary-errors,
+.field-validation-error {
+    color: #FF8497;
+}
+
+.input-validation-error {
+    border-color: #FF647C !important;
+    box-shadow: 0 0 0 3px rgba(255,100,124,.12) !important;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #46517C #0B1222;
+}
+
+    *::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: #0B1222;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: #46517C;
+        border-radius: 10px;
+    }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: #746BFF;
+        }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .au-sidebar {
+        background: linear-gradient( 180deg, #11182B, #0B1120 ) !important;
+    }
+
+    .au-modal-box,
+    .modal-content {
+        border-radius: 16px;
+    }
+
+    .auth-card {
+        background: #11192C !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .au-btn,
+    .au-nav-link,
+    .au-icon-btn {
+        transition: none !important;
+    }
+}

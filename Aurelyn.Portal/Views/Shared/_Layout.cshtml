@@ -1,0 +1,183 @@
+﻿@{
+    var activeMenu = ViewData["ActiveMenu"]?.ToString() ?? "Dashboard";
+    var userName = ViewData["UserFullName"]?.ToString() ?? "Aurelyn Admin";
+    var userRole = ViewData["RoleName"]?.ToString() ?? "Administrator";
+    var initials = ViewData["UserInitials"]?.ToString();
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = string.Join("", userName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2).Select(x => char.ToUpperInvariant(x[0])));
+    }
+    var profilePicture = ViewData["ProfilePicturePath"]?.ToString();
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Dashboard";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>@pageTitle — Aurelyn Care</title>
+    <link rel="icon" type="image/png" href="~/images/favicon.png" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/common.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/css/dark-theme.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- SVG icon library -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="au-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></symbol>
+        <symbol id="au-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></symbol>
+        <symbol id="au-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></symbol>
+        <symbol id="au-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></symbol>
+        <symbol id="au-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5M12 7v5l3 2" /></symbol>
+        <symbol id="au-pills" viewBox="0 0 24 24"><path d="m10.5 3.5 10 10a5 5 0 0 1-7 7l-10-10a5 5 0 0 1 7-7Z" /><path d="m8 16 8-8" /></symbol>
+        <symbol id="au-ambulance" viewBox="0 0 24 24"><path d="M3 7h11v11H3zM14 11h4l3 3v4h-7z" /><circle cx="7.5" cy="18" r="2" /><circle cx="18" cy="18" r="2" /><path d="M8 10v5M5.5 12.5h5" /></symbol>
+        <symbol id="au-location" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></symbol>
+        <symbol id="au-headset" viewBox="0 0 24 24"><path d="M3 13v-2a9 9 0 0 1 18 0v2" /><path d="M5 13h2v6H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2ZM19 13h-2v6h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2ZM17 20a5 5 0 0 1-5 2" /></symbol>
+        <symbol id="au-wallet" viewBox="0 0 24 24"><path d="M4 5h15a2 2 0 0 1 2 2v13H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h13" /><path d="M21 10h-6a2 2 0 0 0 0 4h6" /></symbol>
+        <symbol id="au-chart" viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="m7 14 4-4 4 3 6-7" /></symbol>
+        <symbol id="au-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></symbol>
+        <symbol id="au-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10 21h4" /></symbol>
+        <symbol id="au-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" /></symbol>
+        <symbol id="au-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></symbol>
+        <symbol id="au-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></symbol>
+        <symbol id="au-logout" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></symbol>
+        <symbol id="au-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol>
+        <symbol id="au-close" viewBox="0 0 24 24"><path d="m18 6-12 12M6 6l12 12" /></symbol>
+    </svg>
+
+    <div class="au-shell">
+        <aside class="au-sidebar" id="sidebar">
+            <div class="au-brand">
+                <div class="au-brand-mark">A</div>
+                <div><div class="au-brand-name">Aurelyn Care</div><span class="au-brand-sub">Your Health, Our Priority</span></div>
+                <button type="button" class="ms-auto d-md-none border-0 bg-transparent" id="sidebarClose" aria-label="Close menu"><svg width="18" height="18"><use href="#au-close" /></svg></button>
+            </div>
+
+            <nav class="au-nav" aria-label="Main navigation">
+                <div class="au-nav-group">
+                    <span class="au-nav-label">Workspace</span>
+                    <a asp-controller="Dashboard" asp-action="Index" class="au-nav-link @(activeMenu == "Dashboard" ? "active" : "")"><svg><use href="#au-dashboard" /></svg><span>Dashboard</span></a>
+                </div>
+                <div class="au-nav-group">
+                    <span class="au-nav-label">Clinical</span>
+                    <a asp-controller="Patients" asp-action="Index" class="au-nav-link @(activeMenu == "Patients" ? "active" : "")"><svg><use href="#au-users" /></svg><span>Patients</span></a>
+                    <a asp-controller="Doctors" asp-action="Index" class="au-nav-link @(activeMenu == "Doctors" ? "active" : "")"><svg><use href="#au-user" /></svg><span>Doctors</span></a>
+                    <a asp-controller="Appointments" asp-action="Index" class="au-nav-link @(activeMenu == "Appointments" ? "active" : "")"><svg><use href="#au-calendar" /></svg><span>Appointments</span></a>
+                    <a asp-controller="MedicalHistory" asp-action="Index" class="au-nav-link @(activeMenu == "MedicalHistory" ? "active" : "")"><svg><use href="#au-history" /></svg><span>Medical History</span></a>
+                </div>
+                <div class="au-nav-group">
+                    <span class="au-nav-label">Services</span>
+                    <a asp-controller="PharmacyStore" asp-action="Index" class="au-nav-link @(activeMenu == "PharmacyStore" ? "active" : "")"><svg><use href="#au-pills" /></svg><span>Pharmacy Stores</span></a>
+                    <a asp-controller="Ambulances" asp-action="Index" class="au-nav-link @(activeMenu == "Ambulances" ? "active" : "")"><svg><use href="#au-ambulance" /></svg><span>Ambulances</span></a>
+                    <a asp-controller="LiveTracking" asp-action="Index" class="au-nav-link @(activeMenu == "LiveTracking" ? "active" : "")"><svg><use href="#au-location" /></svg><span>Live Tracking</span></a>
+                    <a asp-controller="CareDesk" asp-action="Index" class="au-nav-link @(activeMenu == "CareDesk" ? "active" : "")"><svg><use href="#au-headset" /></svg><span>Care Desk 24×7</span></a>
+                </div>
+                <div class="au-nav-group">
+                    <span class="au-nav-label">Business</span>
+                    <a asp-controller="Payments" asp-action="Index" class="au-nav-link @(activeMenu == "Payments" ? "active" : "")"><svg><use href="#au-wallet" /></svg><span>Payments</span></a>
+                    <a asp-controller="Reports" asp-action="Index" class="au-nav-link @(activeMenu == "Reports" ? "active" : "")"><svg><use href="#au-chart" /></svg><span>Reports</span></a>
+                </div>
+                <div class="au-nav-group">
+                    <span class="au-nav-label">Administration</span>
+                    <a asp-controller="User" asp-action="Index" class="au-nav-link @(activeMenu == "Users" ? "active" : "")"><svg><use href="#au-users" /></svg><span>Users</span></a>
+                    <a asp-controller="Roles" asp-action="Index" class="au-nav-link @(activeMenu == "Roles" ? "active" : "")"><svg><use href="#au-shield" /></svg><span>Roles &amp; Permissions</span></a>
+                    <a asp-controller="Notifications" asp-action="Index" class="au-nav-link @(activeMenu == "Notifications" ? "active" : "")"><svg><use href="#au-bell" /></svg><span>Notifications</span></a>
+                    <a asp-controller="HelpSupport" asp-action="Index" class="au-nav-link @(activeMenu == "HelpSupport" ? "active" : "")"><svg><use href="#au-help" /></svg><span>Help &amp; Support</span></a>
+                </div>
+            </nav>
+
+            <div class="au-sidebar-bottom">
+                <div class="au-user-mini">
+                    <div class="au-avatar">
+                        @if (!string.IsNullOrWhiteSpace(profilePicture))
+                        {
+                            <img src="@profilePicture" alt="Profile" />
+                        }
+                        else
+                        {
+
+                            @initials
+                        }
+                    </div>
+                    <div class="au-user-details"><span class="au-user-name">@userName</span><span class="au-user-role">@userRole</span></div>
+                </div>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="au-logout-link w-100 border-0 bg-transparent text-start"><svg><use href="#au-logout" /></svg>Sign Out</button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="au-mobile-overlay" id="sidebarOverlay"></div>
+
+        <div class="au-main">
+            <header class="au-topbar">
+                <button type="button" class="au-menu-toggle" id="sidebarToggle" aria-label="Open navigation"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+                <form class="au-search" role="search" onsubmit="return false;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-search" /></svg>
+                    <input type="search" id="globalSearch" placeholder="Search patients, doctors, appointments..." aria-label="Search" />
+                </form>
+                <div class="au-topbar-spacer"></div>
+                <a asp-controller="Notifications" asp-action="Index" class="au-icon-btn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#au-bell" /></svg><span class="au-notif-dot"></span></a>
+                <div class="au-user-wrap" id="userDropWrap">
+                    <button type="button" class="au-user-button" id="userDropBtn" aria-expanded="false">
+                        <span class="au-avatar">
+                            @if (!string.IsNullOrWhiteSpace(profilePicture))
+                            {
+                                <img src="@profilePicture" alt="Profile" />
+                            }
+                            else
+                            {
+
+                                @initials
+                            }
+                        </span>
+                        <span class="au-user-label">@userName</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-chevron" /></svg>
+                    </button>
+                    <div class="au-user-dropdown" id="userDrop">
+                        <a href="javascript:void(0)" class="au-dropdown-item" onclick="loadPopup('@Url.Action("Profile", "User")','My Profile','md')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-user" /></svg>My Profile</a>
+                        <a href="javascript:void(0)" class="au-dropdown-item" onclick="loadPopup('@Url.Action("ChangePassword", "User")','Change Password','md')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-lock" /></svg>Change Password</a>
+                        <div class="dropdown-divider my-1"></div>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="au-dropdown-item w-100 border-0 bg-transparent text-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-logout" /></svg>Sign Out</button>
+                        </form>
+                    </div>
+                </div>
+            </header>
+
+            <main class="au-page-content">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <div class="au-modal-backdrop" id="modalBackdrop"></div>
+    <div class="au-modal-container" id="modalContainer" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="au-modal-box" id="modalBox">
+            <div class="au-modal-header"><h5 class="au-modal-title" id="modalTitle">Details</h5>
+                <button type="button" class="au-modal-close" id="modalClose" aria-label="Close"
+                        style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0 0 2px 0; line-height:1; font-size:22px; border:0; border-radius:50%; cursor:pointer;">
+                    ×
+                </button>
+            </div>
+            <div class="au-modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="~/js/common.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,119 @@
+﻿@model Aurelyn.Portal.Models.Otp.OtpViewModel
+
+@{
+    ViewData["Title"] = "Verify your account";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    var email = ViewBag.Email as string ?? "";
+}
+
+<style>
+    .auth-card {
+    margin-left:20px;
+    }
+</style>
+
+@section Hero {
+    <svg class="auth-art" viewBox="0 0 240 210" aria-hidden="true"><use href="#art-shield" /></svg>
+    <h1>Verify Your Account</h1>
+    <p>Enter the 6-digit code sent to <strong>@email</strong> to continue securely.</p>
+}
+
+<h2 class="auth-title">OTP Verification</h2>
+<p class="auth-sub">Enter the 6-digit code sent to<br /><strong>@email</strong></p>
+
+<form asp-controller="Account" asp-action="VerifyOtp" method="post" id="otpForm" data-auth-form novalidate>
+    <input type="hidden" name="Otp" id="otpValue" />
+    <div class="otp-row" id="otpRow">
+        @for (var i = 0; i < 6; i++)
+        {
+            <input type="text" class="otp-box" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="@(i == 0 ? "one-time-code" : "off")" aria-label="Digit @(i + 1)" />
+        }
+    </div>
+
+    <button type="submit" class="au-btn au-btn-primary auth-btn">
+        Verify
+        <span class="arrow"><svg><use href="#i-arrow" /></svg></span>
+    </button>
+</form>
+
+<div class="otp-resend">
+    <svg><use href="#i-refresh" /></svg>
+    <span id="resendText">Resend OTP in <strong id="resendTimer">00:45</strong></span>
+    <button type="button" class="auth-link" id="resendBtn" style="display:none">Resend OTP</button>
+</div>
+
+<a asp-controller="Account" asp-action="Login" class="auth-back"><svg><use href="#i-back" /></svg>Back to Login</a>
+
+@section Scripts {
+    <script>
+        (function () {
+            var $boxes = $(".otp-box"), RESEND_SECONDS = 45, timer;
+
+            function collect() {
+                var code = $boxes.map(function () { return this.value; }).get().join("");
+                $("#otpValue").val(code);
+                return code;
+            }
+
+            $boxes.on("input", function () {
+                this.value = this.value.replace(/\D/g, "").slice(0, 1);
+                if (this.value) $boxes.eq($boxes.index(this) + 1).trigger("focus");
+                if (collect().length === 6) $("#otpForm").trigger("submit");
+            }).on("keydown", function (e) {
+                var i = $boxes.index(this);
+                if (e.key === "Backspace" && !this.value && i > 0) $boxes.eq(i - 1).val("").trigger("focus");
+                if (e.key === "ArrowLeft" && i > 0) $boxes.eq(i - 1).trigger("focus");
+                if (e.key === "ArrowRight" && i < 5) $boxes.eq(i + 1).trigger("focus");
+            }).on("paste", function (e) {
+                var text = (e.originalEvent.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "").slice(0, 6);
+                if (!text) return;
+                e.preventDefault();
+                $boxes.each(function (i) { this.value = text[i] || ""; });
+                $boxes.eq(Math.min(text.length, 5)).trigger("focus");
+                if (collect().length === 6) $("#otpForm").trigger("submit");
+            });
+
+            // block submit until all 6 digits are entered
+            $("#otpForm").on("submit", function (e) {
+                if (collect().length < 6) {
+                    e.stopImmediatePropagation(); e.preventDefault();
+                    showError("Enter the 6-digit code.");
+                }
+            });
+
+            function startTimer() {
+                var left = RESEND_SECONDS;
+                $("#resendBtn").hide(); $("#resendText").show();
+                clearInterval(timer);
+                (function tick() {
+                    var m = ("0" + Math.floor(left / 60)).slice(-2), s = ("0" + (left % 60)).slice(-2);
+                    $("#resendTimer").text(m + ":" + s);
+                    if (left-- <= 0) { clearInterval(timer); $("#resendText").hide(); $("#resendBtn").show(); }
+                })();
+                timer = setInterval(function () {
+                    var m = ("0" + Math.floor(left / 60)).slice(-2), s = ("0" + (left % 60)).slice(-2);
+                    $("#resendTimer").text(m + ":" + s);
+                    if (left-- <= 0) { clearInterval(timer); $("#resendText").hide(); $("#resendBtn").show(); }
+                }, 1000);
+            }
+
+            $("#resendBtn").on("click", function () {
+                var $b = $(this).prop("disabled", true);
+                ajaxPost('@Url.Action("ResendOtp", "Account")', {}, function (res) {
+                    $b.prop("disabled", false);
+                    if (res && res.status) {
+                        showSuccess(res.message);
+                        $boxes.val("").first().trigger("focus");
+                        startTimer();
+                    } else {
+                        showError((res && res.message) || "Could not resend the code.");
+                        if (res && res.returnUrl) setTimeout(function () { location.href = res.returnUrl; }, 900);
+                    }
+                }, function () { $b.prop("disabled", false); showError("Could not resend the code."); });
+            });
+
+            $boxes.first().trigger("focus");
+            startTimer();
+        })();
+    </script>
+}
