@@ -37,6 +37,7 @@ namespace Aurelyn.Portal.Middleware
                     path.Contains(RouteConstants.ResendOtp.ToLower()) ||
                     path.Contains(RouteConstants.ForgotPassword.ToLower()) ||
                     path.Contains(RouteConstants.ResetPassword.ToLower()) ||
+                    path.StartsWith("/error") ||
                     path.Contains("/account/sendresetcode"))
             {
                 await _next(context);

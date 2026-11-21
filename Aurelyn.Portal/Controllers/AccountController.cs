@@ -174,6 +174,8 @@ namespace Aurelyn.App.Controllers
                     SessionHelper.SetInitials(HttpContext.Session, profile.Initials);
                     SessionHelper.SetBackgroundColorCode(HttpContext.Session, "#1F3358");
                     SessionHelper.SetColorCode(HttpContext.Session, "#FFFFFF");
+                    HttpContext.Session.SetString("ProfilePicture", profile.ProfilePictureUrl ?? "");
+                    HttpContext.Session.SetString("ProfileComplete", ProfileHelper.IsComplete(profile) ? "1" : "0");
                 }
                 else
                 {

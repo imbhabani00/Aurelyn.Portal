@@ -429,6 +429,10 @@ button, input {
         width: min(390px,100%);
     }
 
+    .au-modal-box.modal-md {
+        width: min(560px, 100%);
+    }
+
     .au-modal-box.modal-lg {
         width: min(760px,100%);
     }

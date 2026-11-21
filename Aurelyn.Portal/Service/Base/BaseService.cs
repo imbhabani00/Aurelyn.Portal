@@ -151,10 +151,10 @@ namespace Ecommerce.Web.Services.Base
 
         #endregion
 
-        #region DoHttpPostFile
-        protected async Task<HttpResponseMessage?> DoHttpPostFile(
+        #region DoHttpPostMultipart
+        protected async Task<HttpResponseMessage?> DoHttpPostMultipart(
             string endpoint,
-            IFormFile file,
+            IFormFile? file,
             string fieldName = "file",
             bool useAuth = true)
         {
@@ -165,25 +165,30 @@ namespace Ecommerce.Web.Services.Base
                     : _httpClientFactory.CreateClient("HealthCareApi");
 
                 using var content = new MultipartFormDataContent();
-                using var fileStream = file.OpenReadStream();
-                using var streamContent = new StreamContent(fileStream);
+                await using var fileStream = file?.OpenReadStream();
 
-                streamContent.Headers.ContentType =
-                    new MediaTypeHeaderValue(
-                        string.IsNullOrEmpty(file.ContentType)
-                            ? "application/octet-stream"
-                            : file.ContentType);
+                if (file != null && file.Length > 0 && fileStream != null)
+                {
+                    var streamContent = new StreamContent(fileStream);
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue(
+                        string.IsNullOrEmpty(file.ContentType) ? "application/octet-stream" : file.ContentType);
+                    content.Add(streamContent, fieldName, file.FileName);
+                }
+                else
+                {
+                    content.Add(new StringContent("true"), "remove");
+                }
 
-                content.Add(streamContent, fieldName, file.FileName);
+                using var request = new HttpRequestMessage(HttpMethod.Post, endpoint) { Content = content };
 
-                return await client.PostAsync(endpoint, content);
+                return await client.SendAsync(request);
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Logger.Error(ex, "DoHttpPostMultipart error. Endpoint: {Endpoint}", endpoint);
                 return null;
             }
         }
-
         #endregion
 
         #region DoHttpPostNoBody
@@ -205,42 +210,5 @@ namespace Ecommerce.Web.Services.Base
         }
 
         #endregion
-
-        //#region ApiResponse
-        //protected async Task<Aurelyn.Portal.Models.Common.ApiResponse> ApiResponse(
-        //    HttpResponseMessage? response)
-        //{
-        //    try
-        //    {
-        //        if (response == null)
-        //        {
-        //            return new Aurelyn.Portal.Models.Common.ApiResponse
-        //            {
-        //                Status = false,
-        //                Message = "Unable to connect to API."
-        //            };
-        //        }
-
-        //        var content = await response.Content.ReadAsStringAsync();
-
-        //        var apiResponse =
-        //            JsonConvert.DeserializeObject<Aurelyn.Portal.Models.Common.ApiResponse>(content);
-
-        //        return apiResponse ?? new Aurelyn.Portal.Models.Common.ApiResponse
-        //        {
-        //            Status = false,
-        //            Message = "Invalid API response."
-        //        };
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return new Aurelyn.Portal.Models.Common.ApiResponse
-        //        {
-        //            Status = false,
-        //            Message = "Error while processing API response."
-        //        };
-        //    }
-        //}
-        //#endregion
     }
 }

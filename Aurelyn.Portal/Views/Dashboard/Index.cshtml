@@ -1,6 +1,823 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
+    ViewData["ActiveMenu"] = "Dashboard";
+
+    var fullName = Context.Session.GetString("UserFullName") ?? "Admin";
+    var firstName = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "there";
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+
+    // ---- Hardcoded demo data (replace with ViewModel later) ----
+    var stats = new[]
+    {
+        new { Label = "Total Patients",  Value = "1,250", Num = 1250, Trend = "+12%", Icon = "au-users",    Tone = "indigo", Live = false, Spark = new[] { 3, 4, 4, 6, 5, 8, 9 } },
+        new { Label = "Total Doctors",   Value = "245",   Num = 245,  Trend = "+8%",  Icon = "au-user",     Tone = "teal",   Live = false, Spark = new[] { 5, 5, 6, 6, 7, 7, 8 } },
+        new { Label = "Appointments",    Value = "820",   Num = 820,  Trend = "+15%", Icon = "au-calendar", Tone = "amber",  Live = false, Spark = new[] { 2, 5, 4, 7, 6, 9, 10 } },
+        new { Label = "Ambulances",      Value = "9",     Num = 9,    Trend = "",     Icon = "au-ambulance",Tone = "rose",   Live = true,  Spark = new[] { 6, 5, 7, 4, 6, 5, 6 } }
+    };
+
+    var depts = new[]
+    {
+        new { Name = "Cardiology",  Pct = 28, Color = "#8b92ff" },
+        new { Name = "Neurology",   Pct = 22, Color = "#2dd4bf" },
+        new { Name = "Pediatrics",  Pct = 20, Color = "#fbbf24" },
+        new { Name = "Orthopedics", Pct = 16, Color = "#fb7185" },
+        new { Name = "Others",      Pct = 14, Color = "#64748b" }
+    };
+
+    var fleet = new[]
+    {
+        new { Unit = "AMB-01", Where = "Koramangala",  State = "En route",  Eta = "6 min"  },
+        new { Unit = "AMB-04", Where = "Whitefield",   State = "En route",  Eta = "11 min" },
+        new { Unit = "AMB-07", Where = "Main Hospital",State = "Available", Eta = "Ready"  },
+        new { Unit = "AMB-09", Where = "Indiranagar",  State = "Busy",      Eta = "At scene" }
+    };
+    string F(double v) => v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    var upcoming = new[]
+    {
+        new { Name = "Priya Sharma",  Dept = "Cardiology",  Time = "09:00 AM", Status = "Confirmed" },
+        new { Name = "Arjun Mehta",   Dept = "Neurology",   Time = "10:30 AM", Status = "Confirmed" },
+        new { Name = "Sneha Iyer",    Dept = "Pediatrics",  Time = "11:15 AM", Status = "Pending"   },
+        new { Name = "Rohit Verma",   Dept = "Orthopedics", Time = "01:00 PM", Status = "Confirmed" }
+    };
+
+    var activities = new[]
+    {
+        new { Text = "New patient registered",       Sub = "Ananya Rao added to Patients",       When = "2 min ago",  Icon = "au-users"    },
+        new { Text = "Appointment booked",           Sub = "Dr. Kapoor, Cardiology",             When = "5 min ago",  Icon = "au-calendar" },
+        new { Text = "Ambulance dispatched",         Sub = "Unit AMB-04 to Whitefield",          When = "12 min ago", Icon = "au-ambulance"},
+        new { Text = "Payment received",             Sub = "₹4,500 from Priya Sharma",           When = "28 min ago", Icon = "au-wallet"   }
+    };
+
+    var services = new[]
+    {
+        new { Label = "Pharmacy Stores", Value = "36",      Sub = "32 open now",        Icon = "au-pills"  },
+        new { Label = "Live Tracking",   Value = "5",       Sub = "ambulances on route",Icon = "au-location"},
+        new { Label = "Today's Revenue", Value = "₹1.84L",  Sub = "+9% vs yesterday",   Icon = "au-wallet" },
+        new { Label = "Care Desk 24×7",  Value = "14",      Sub = "open tickets",       Icon = "au-headset"}
+    };
 }
 
-<h2>Welcome, @Context.Session.GetString("UserFullName")</h2>
-<p>You are signed in.</p>
+@section Styles {
+    <style>
+        .dash {
+            --d-card: rgba(30, 34, 66, .72);
+            --d-card-2: rgba(40, 45, 88, .55);
+            --d-line: rgba(255, 255, 255, .08);
+            --d-text: #eef0ff;
+            --d-muted: #9aa1cc;
+            --d-accent: #8b92ff;
+            --d-green: #34d399;
+            --d-amber: #fbbf24;
+            --d-rose: #fb7185;
+            --d-teal: #2dd4bf;
+            color: var(--d-text);
+            display: grid;
+            gap: 20px;
+        }
+
+            .dash svg.ic {
+                width: 20px;
+                height: 20px;
+                fill: none;
+                stroke: currentColor;
+                stroke-width: 1.8;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+        .dash-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+            .dash-head h1 {
+                font-size: 1.7rem;
+                font-weight: 700;
+                margin: 0 0 4px;
+                letter-spacing: -.01em;
+            }
+
+            .dash-head p {
+                margin: 0;
+                color: var(--d-muted);
+            }
+
+        .dash-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--d-card);
+            border: 1px solid var(--d-line);
+            font-size: .85rem;
+        }
+
+            .dash-pill i {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--d-green);
+                box-shadow: 0 0 0 4px rgba(52, 211, 153, .18);
+            }
+
+        .dash-card {
+            background: linear-gradient(160deg, var(--d-card), var(--d-card-2));
+            border: 1px solid var(--d-line);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(5, 8, 30, .35);
+        }
+
+            .dash-card h3 {
+                font-size: 1rem;
+                font-weight: 600;
+                margin: 0;
+            }
+
+        .dash-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+
+        .dash-link {
+            color: var(--d-accent);
+            font-size: .85rem;
+            text-decoration: none;
+        }
+
+            .dash-link:hover {
+                text-decoration: underline;
+            }
+
+        .dash-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .dash-grid-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .dash-grid-3 {
+            display: grid;
+            grid-template-columns: 1.3fr 1.3fr 1fr;
+            gap: 20px;
+        }
+
+        /* stat cards */
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            flex: none;
+        }
+
+            .stat-icon svg.ic {
+                width: 24px;
+                height: 24px;
+            }
+
+        .tone-indigo {
+            background: rgba(139, 146, 255, .16);
+            color: var(--d-accent);
+        }
+
+        .tone-teal {
+            background: rgba(45, 212, 191, .16);
+            color: var(--d-teal);
+        }
+
+        .tone-amber {
+            background: rgba(251, 191, 36, .16);
+            color: var(--d-amber);
+        }
+
+        .tone-rose {
+            background: rgba(251, 113, 133, .16);
+            color: var(--d-rose);
+        }
+
+        .stat-value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .stat-label {
+            color: var(--d-muted);
+            font-size: .88rem;
+        }
+
+        .stat-badge {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            font-size: .75rem;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(52, 211, 153, .14);
+            color: var(--d-green);
+        }
+
+            .stat-badge.live {
+                background: rgba(251, 113, 133, .16);
+                color: var(--d-rose);
+            }
+
+        /* chart */
+        .range {
+            display: inline-flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, .05);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+            .range button {
+                border: 0;
+                background: transparent;
+                color: var(--d-muted);
+                font-size: .78rem;
+                padding: 5px 11px;
+                border-radius: 9px;
+                cursor: pointer;
+            }
+
+                .range button.active {
+                    background: var(--d-accent);
+                    color: #0f1230;
+                    font-weight: 600;
+                }
+
+                .range button:focus-visible, .qa:focus-visible, .dash-link:focus-visible {
+                    outline: 2px solid var(--d-accent);
+                    outline-offset: 2px;
+                }
+
+        #apptChart {
+            width: 100%;
+            height: 260px;
+            display: block;
+        }
+
+            #apptChart text {
+                fill: var(--d-muted);
+                font-size: 11px;
+            }
+
+        .chart-tip {
+            position: absolute;
+            pointer-events: none;
+            background: #11142e;
+            border: 1px solid var(--d-line);
+            border-radius: 8px;
+            padding: 4px 9px;
+            font-size: .78rem;
+            transform: translate(-50%, -130%);
+            opacity: 0;
+            transition: opacity .15s;
+            white-space: nowrap;
+        }
+
+        /* quick actions */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .qa {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 104px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--d-line);
+            color: var(--d-text);
+            text-decoration: none;
+            font-size: .85rem;
+            text-align: center;
+            transition: background .15s, border-color .15s;
+        }
+
+            .qa:hover {
+                background: rgba(139, 146, 255, .14);
+                border-color: rgba(139, 146, 255, .4);
+                color: var(--d-text);
+            }
+
+            .qa .stat-icon {
+                width: 42px;
+                height: 42px;
+                border-radius: 12px;
+            }
+
+        /* lists */
+        .row-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 0;
+            border-top: 1px solid var(--d-line);
+        }
+
+            .row-item:first-of-type {
+                border-top: 0;
+            }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: .8rem;
+            font-weight: 600;
+            background: rgba(139, 146, 255, .18);
+            color: var(--d-accent);
+            flex: none;
+        }
+
+        .row-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .row-title {
+            font-size: .9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .row-sub {
+            font-size: .78rem;
+            color: var(--d-muted);
+        }
+
+        .row-time {
+            font-size: .8rem;
+            color: var(--d-muted);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: .7rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-top: 3px;
+        }
+
+            .tag.ok {
+                background: rgba(52, 211, 153, .14);
+                color: var(--d-green);
+            }
+
+            .tag.wait {
+                background: rgba(251, 191, 36, .14);
+                color: var(--d-amber);
+            }
+
+        .act-ic {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .06);
+            color: var(--d-accent);
+            flex: none;
+        }
+
+        /* help card */
+        .help {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(160deg, rgba(99, 102, 241, .35), rgba(30, 34, 66, .7));
+        }
+
+            .help .stat-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+            }
+
+            .help p {
+                margin: 0;
+                color: var(--d-muted);
+                font-size: .85rem;
+            }
+
+        .help-btn {
+            margin-top: 4px;
+            border: 0;
+            border-radius: 12px;
+            padding: 9px 18px;
+            background: var(--d-accent);
+            color: #0f1230;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .help-btn:hover {
+                color: #0f1230;
+                filter: brightness(1.08);
+            }
+
+        /* services strip */
+        .svc {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+            .svc .stat-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+            }
+
+            .svc b {
+                font-size: 1.25rem;
+                display: block;
+                line-height: 1.2;
+            }
+
+            .svc small {
+                color: var(--d-muted);
+            }
+
+        .dash-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .spark {
+            position: absolute;
+            right: 16px;
+            bottom: 14px;
+            width: 80px;
+            height: 28px;
+            background: none !important;
+            opacity: .9;
+        }
+
+        .donut-wrap {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .legend {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            min-width: 160px;
+            display: grid;
+            gap: 9px;
+            font-size: .88rem;
+        }
+
+            .legend li {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .legend i {
+                width: 10px;
+                height: 10px;
+                border-radius: 3px;
+            }
+
+            .legend b {
+                margin-left: auto;
+                font-weight: 600;
+            }
+
+        .tag.go {
+            background: rgba(139, 146, 255, .18);
+            color: var(--d-accent);
+            animation: dashPulse 1.8s ease-in-out infinite;
+        }
+
+        @@keyframes dashPulse {
+            50% {
+                opacity: .55;
+            }
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            .tag.go {
+                animation: none;
+            }
+        }
+
+        @@media (max-width: 1200px) {
+            .dash-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dash-grid-main, .dash-grid-3, .dash-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 575px) {
+            .dash-grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+}
+
+<div class="dash">
+
+    <div class="dash-head">
+        <div>
+            <h1>@greeting, @firstName 👋</h1>
+            <p>Here's what's happening with your healthcare platform today.</p>
+        </div>
+        <span class="dash-pill"><i></i> System Operational</span>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="dash-grid-4">
+        @foreach (var s in stats)
+        {
+            <div class="dash-card stat">
+                <div class="stat-icon tone-@s.Tone"><svg class="ic"><use href="#@s.Icon" /></svg></div>
+                <div>
+                    <div class="stat-value count" data-count="@s.Num">@s.Value</div>
+                    <div class="stat-label">@s.Label</div>
+                </div>
+                @if (s.Live)
+                {
+                    <span class="stat-badge live">● Live</span>
+                }
+                else
+                {
+                    <span class="stat-badge">▲ @s.Trend</span>
+                }
+                @{
+                    var sp = string.Join(" ", s.Spark.Select((v, i) => F(i * 80.0 / (s.Spark.Length - 1)) + "," + F(26 - v * 2.3)));
+                }
+                <svg class="spark tone-@s.Tone" viewBox="0 0 80 28" preserveAspectRatio="none" aria-hidden="true"><polyline points="@sp" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </div>
+        }
+    </div>
+
+    <!-- Chart + quick actions -->
+    <div class="dash-grid-main">
+        <div class="dash-card" style="position:relative">
+            <div class="dash-card-head">
+                <h3>Appointments Overview</h3>
+                <div class="range" id="apptRange" role="group" aria-label="Chart range">
+                    <button type="button" data-r="7D" class="active">7D</button>
+                    <button type="button" data-r="30D">30D</button>
+                    <button type="button" data-r="3M">3M</button>
+                    <button type="button" data-r="1Y">1Y</button>
+                </div>
+            </div>
+            <svg id="apptChart" viewBox="0 0 640 260" preserveAspectRatio="none" role="img" aria-label="Appointments over time"></svg>
+            <div class="chart-tip" id="chartTip"></div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-head"><h3>Quick Actions</h3></div>
+            <div class="qa-grid">
+                <a class="qa" asp-controller="Patients" asp-action="Index"><span class="stat-icon tone-indigo"><svg class="ic"><use href="#au-users" /></svg></span>Add Patient</a>
+                <a class="qa" asp-controller="Appointments" asp-action="Index"><span class="stat-icon tone-amber"><svg class="ic"><use href="#au-calendar" /></svg></span>Book Appointment</a>
+                <a class="qa" asp-controller="Reports" asp-action="Index"><span class="stat-icon tone-teal"><svg class="ic"><use href="#au-chart" /></svg></span>View Reports</a>
+                <a class="qa" asp-controller="LiveTracking" asp-action="Index"><span class="stat-icon tone-rose"><svg class="ic"><use href="#au-ambulance" /></svg></span>Track Ambulance</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services at a glance -->
+    <div class="dash-grid-4">
+        @foreach (var v in services)
+        {
+            <div class="dash-card svc">
+                <div class="stat-icon tone-indigo"><svg class="ic"><use href="#@v.Icon" /></svg></div>
+                <div><b>@v.Value</b><span>@v.Label</span><br /><small>@v.Sub</small></div>
+            </div>
+        }
+    </div>
+
+    <!-- Departments + ambulance fleet -->
+    <div class="dash-grid-2">
+        <div class="dash-card">
+            <div class="dash-card-head"><h3>Appointments by Department</h3></div>
+            <div class="donut-wrap">
+                <svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="Appointments by department">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="14" />
+                    @{
+                        double off = 0;
+                    }
+                    @foreach (var d in depts)
+                    {
+                        var len = d.Pct * 3.2673;
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="@d.Color" stroke-width="14"
+                                stroke-dasharray="@F(len - 2) @F(326.73)" stroke-dashoffset="@F(-off)"
+                                transform="rotate(-90 60 60)" />
+                        off += len;
+                    }
+                    <text x="60" y="58" text-anchor="middle" fill="#eef0ff" font-size="20" font-weight="700">820</text>
+                    <text x="60" y="74" text-anchor="middle" fill="#9aa1cc" font-size="9">this month</text>
+                </svg>
+                <ul class="legend">
+                    @foreach (var d in depts)
+                    {
+                        <li><i style="background:@d.Color"></i>@d.Name<b>@d.Pct%</b></li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h3>Ambulance Fleet</h3>
+                <a class="dash-link" asp-controller="LiveTracking" asp-action="Index">Live Map</a>
+            </div>
+            @foreach (var f in fleet)
+            {
+                var cls = f.State == "En route" ? "go" : f.State == "Available" ? "ok" : "wait";
+                <div class="row-item">
+                    <div class="act-ic"><svg class="ic"><use href="#au-ambulance" /></svg></div>
+                    <div class="row-main">
+                        <div class="row-title">@f.Unit</div>
+                        <div class="row-sub">@f.Where</div>
+                    </div>
+                    <div class="row-time"><span class="tag @cls">@(f.State == "En route" ? "● " : "")@f.State</span><br />@f.Eta</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Upcoming / activity / help -->
+    <div class="dash-grid-3">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h3>Upcoming Appointments</h3>
+                <a class="dash-link" asp-controller="Appointments" asp-action="Index">View All</a>
+            </div>
+            @foreach (var a in upcoming)
+            {
+                var ini = string.Concat(a.Name.Split(' ').Select(p => p[0]));
+                <div class="row-item">
+                    <div class="avatar">@ini</div>
+                    <div class="row-main">
+                        <div class="row-title">@a.Name</div>
+                        <div class="row-sub">@a.Dept</div>
+                    </div>
+                    <div class="row-time">@a.Time<br /><span class="tag @(a.Status == "Confirmed" ? "ok" : "wait")">@a.Status</span></div>
+                </div>
+            }
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h3>Recent Activities</h3>
+                <a class="dash-link" asp-controller="Notifications" asp-action="Index">View All</a>
+            </div>
+            @foreach (var r in activities)
+            {
+                <div class="row-item">
+                    <div class="act-ic"><svg class="ic"><use href="#@r.Icon" /></svg></div>
+                    <div class="row-main">
+                        <div class="row-title">@r.Text</div>
+                        <div class="row-sub">@r.Sub</div>
+                    </div>
+                    <div class="row-time">@r.When</div>
+                </div>
+            }
+        </div>
+
+        <div class="dash-card help">
+            <div class="stat-icon tone-indigo"><svg class="ic"><use href="#au-headset" /></svg></div>
+            <h3>Need Help?</h3>
+            <p>Our support team is here to assist you 24×7.</p>
+            <a class="help-btn" asp-controller="CareDesk" asp-action="Index">Contact Support</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function() {
+            // Hardcoded chart data. Replace with an AJAX call later.
+            var data = {
+                '7D': { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [180, 230, 205, 420, 310, 150, 120] },
+                '30D': { labels: ['W1', 'W2', 'W3', 'W4'], values: [980, 1120, 1050, 1240] },
+                '3M': { labels: ['Sep', 'Oct', 'Nov'], values: [3900, 4300, 4650] },
+                '1Y': { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], values: [3100, 3300, 3500, 3400, 3800, 4000, 4200, 4100, 3900, 4300, 4650, 4800] }
+            };
+            var svg = document.getElementById('apptChart');
+            var tip = document.getElementById('chartTip');
+            var W = 640, H = 260, L = 40, R = 14, T = 16, B = 28;
+            var NS = 'http://www.w3.org/2000/svg';
+
+            function el(name, attrs) {
+                var n = document.createElementNS(NS, name);
+                for (var k in attrs) n.setAttribute(k, attrs[k]);
+                return n;
+            }
+
+            function draw(key) {
+                var d = data[key], max = Math.max.apply(null, d.values), top = Math.ceil(max * 1.15 / 100) * 100;
+                var stepX = (W - L - R) / (d.values.length - 1);
+                var x = function(i) { return L + i * stepX; };
+                var y = function(v) { return T + (H - T - B) * (1 - v / top); };
+                svg.innerHTML = '';
+
+                var defs = el('defs', {});
+                var g = el('linearGradient', { id: 'ag', x1: 0, y1: 0, x2: 0, y2: 1 });
+                g.appendChild(el('stop', { offset: '0%', 'stop-color': '#8b92ff', 'stop-opacity': '.38' }));
+                g.appendChild(el('stop', { offset: '100%', 'stop-color': '#8b92ff', 'stop-opacity': '0' }));
+                defs.appendChild(g); svg.appendChild(defs);
+
+                for (var i = 0; i <= 4; i++) {
+                    var gv = top / 4 * i, gy = y(gv);
+                    svg.appendChild(el('line', { x1: L, x2: W - R, y1: gy, y2: gy, stroke: 'rgba(255,255,255,.07)' }));
+                    var t = el('text', { x: L - 8, y: gy + 4, 'text-anchor': 'end' }); t.textContent = Math.round(gv); svg.appendChild(t);
+                }
+
+                var pts = d.values.map(function(v, i) { return x(i) + ',' + y(v); });
+                svg.appendChild(el('polygon', { points: x(0) + ',' + y(0) + ' ' + pts.join(' ') + ' ' + x(d.values.length - 1) + ',' + y(0), fill: 'url(#ag)' }));
+                svg.appendChild(el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#8b92ff', 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+
+                d.values.forEach(function(v, i) {
+                    var lb = el('text', { x: x(i), y: H - 8, 'text-anchor': 'middle' }); lb.textContent = d.labels[i]; svg.appendChild(lb);
+                    var c = el('circle', { cx: x(i), cy: y(v), r: 4, fill: '#161a3a', stroke: '#8b92ff', 'stroke-width': 2, style: 'cursor:pointer' });
+                    c.addEventListener('mouseenter', function() {
+                        var box = svg.getBoundingClientRect(), pbox = svg.parentNode.getBoundingClientRect();
+                        tip.textContent = d.labels[i] + ': ' + v.toLocaleString();
+                        tip.style.left = (box.left - pbox.left + x(i) / W * box.width) + 'px';
+                        tip.style.top = (box.top - pbox.top + y(v) / H * box.height) + 'px';
+                        tip.style.opacity = 1;
+                    });
+                    c.addEventListener('mouseleave', function() { tip.style.opacity = 0; });
+                    svg.appendChild(c);
+                });
+            }
+
+            document.getElementById('apptRange').addEventListener('click', function(e) {
+                var b = e.target.closest('button'); if (!b) return;
+                this.querySelectorAll('button').forEach(function(x) { x.classList.remove('active'); });
+                b.classList.add('active');
+                draw(b.getAttribute('data-r'));
+            });
+            draw('7D');
+
+            // Count-up on the stat numbers (skipped if the user prefers reduced motion)
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.count').forEach(function(n) {
+                    var target = parseInt(n.getAttribute('data-count'), 10), start = null;
+                    function step(ts) {
+                        if (!start) start = ts;
+                        var p = Math.min((ts - start) / 900, 1), e = 1 - Math.pow(1 - p, 3);
+                        n.textContent = Math.round(target * e).toLocaleString();
+                        if (p < 1) requestAnimationFrame(step);
+                    }
+                    requestAnimationFrame(step);
+                });
+            }
+        })();
+    </script>
+}
