@@ -16,7 +16,7 @@
                 options.Cookie.IsEssential = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Strict;
-                options.Cookie.Name = cookieName ?? "Ecommerce.Web.Session";
+                options.Cookie.Name = cookieName ?? "HealthCare.Web.Session";
             });
 
             return services;

@@ -36,7 +36,6 @@ try
     // Services + HttpClient + AppSettings
     builder.Services.AddApplicationServices(builder.Configuration);
 
-    // Routing
     builder.Services.AddRouting(options =>
     {
         options.LowercaseUrls = true;
@@ -47,9 +46,6 @@ try
     {
         options.HeaderName = "RequestVerificationToken";
     });
-
-    //builder.Services.Configure<EmailSettings>(
-    //builder.Configuration.GetSection("EmailSettings"));
 
     builder.Services.AddAuthentication(options =>
     {
@@ -71,11 +67,14 @@ try
     }
 
     app.UseMiddleware<ExceptionMiddleware>();
+    app.UseStatusCodePagesWithReExecute("/Error/Index", "?code={0}");
+    if (!app.Environment.IsDevelopment()) app.UseHsts();
     app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.UseRouting();
     app.UseSession();
     app.UseMiddleware<AuthMiddleware>();
+    app.UseMiddleware<ProfileGateMiddleware>();
     app.UseAuthentication();
     app.UseAuthorization();
 

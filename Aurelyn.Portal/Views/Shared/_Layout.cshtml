@@ -8,7 +8,7 @@
         initials = string.Join("", userName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Take(2).Select(x => char.ToUpperInvariant(x[0])));
     }
-    var profilePicture = ViewData["ProfilePicturePath"]?.ToString();
+    var profilePicture = ViewData["ProfilePicturePath"]?.ToString() ?? Context.Session.GetString("ProfilePicture");
     var pageTitle = ViewData["Title"]?.ToString() ?? "Dashboard";
 }
 <!DOCTYPE html>
@@ -136,7 +136,6 @@
                             }
                             else
                             {
-
                                 @initials
                             }
                         </span>
@@ -144,7 +143,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-chevron" /></svg>
                     </button>
                     <div class="au-user-dropdown" id="userDrop">
-                        <a href="javascript:void(0)" class="au-dropdown-item" onclick="loadPopup('@Url.Action("Profile", "User")','My Profile','md')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-user" /></svg>My Profile</a>
+                        <a href="javascript:void(0)" class="au-dropdown-item" onclick="loadPopup('@Url.Action("Profile", "User")','My Profile','xl')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-user" /></svg>My Profile</a>
                         <a href="javascript:void(0)" class="au-dropdown-item" onclick="loadPopup('@Url.Action("ChangePassword", "User")','Change Password','md')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#au-lock" /></svg>Change Password</a>
                         <div class="dropdown-divider my-1"></div>
                         <form asp-controller="Account" asp-action="Logout" method="post">
@@ -165,7 +164,7 @@
     <div class="au-modal-container" id="modalContainer" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="au-modal-box" id="modalBox">
             <div class="au-modal-header"><h5 class="au-modal-title" id="modalTitle">Details</h5>
-                <button type="button" class="au-modal-close" id="modalClose" aria-label="Close"
+                <button type="button" id="modalClose" class="au-modal-close" aria-label="Close"
                         style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0 0 2px 0; line-height:1; font-size:22px; border:0; border-radius:50%; cursor:pointer;">
                     ×
                 </button>
@@ -178,6 +177,20 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/toastr/toastr.min.js"></script>
     <script src="~/js/common.js" asp-append-version="true"></script>
+    @if (Context.Session.GetString("ProfileComplete") == "0")
+    {
+        <script>
+            $(function () {
+                if (window.__pfAutoOpened) return;
+                window.__pfAutoOpened = true;
+                loadPopup('@Url.Action("Profile", "User")', 'My Profile', 'xl');
+            });
+        </script>
+    }
+    <script>
+        // back/forward cache can restore a stale page without re-running scripts
+        window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
