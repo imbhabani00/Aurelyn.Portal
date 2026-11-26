@@ -38,23 +38,38 @@ namespace Ecommerce.Web.Services.Base
         #region GetHttpClient
         private HttpClient GetHttpClient()
         {
+            var context = _httpContextAccessor.HttpContext;
+
+            if (context == null)
+                throw new InvalidOperationException("HttpContext is missing.");
+
+            var token = context.Session.GetString(
+                SessionConstants.AccessToken);
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                Log.Logger.Error("API request failed: Access token missing from Session.");
+                throw new UnauthorizedAccessException(
+                    "Access token not found in Session.");
+            }
+
             var client = _httpClientFactory.CreateClient("HealthCareApi");
 
-            var token = _httpContextAccessor.HttpContext?.Session
-                .GetString(SessionConstants.AccessToken);
+            Log.Logger.Information(
+                "API request: Session available, access token present. Token length: {Length}",
+                token.Length);
 
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-            }
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
             return client;
         }
 
+
         #endregion
 
         #region DoHttpGet
+
         protected async Task<HttpResponseMessage?> DoHttpGet(
             string endpoint, bool useAuth = true)
         {
@@ -64,14 +79,27 @@ namespace Ecommerce.Web.Services.Base
                     ? GetHttpClient()
                     : _httpClientFactory.CreateClient("HealthCareApi");
 
-                return await client.GetAsync(endpoint);
+                var response = await client.GetAsync(endpoint);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    Log.Logger.Error(
+                        "API GET failed. Endpoint: {Endpoint}, Status: {Status}, Response: {Response}",
+                        endpoint,
+                        (int)response.StatusCode,
+                        content);
+                }
+
+                return response;
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Logger.Error(ex, "DoHttpGet exception: {Endpoint}", endpoint);
                 return null;
             }
         }
-
         #endregion
 
         #region DoHttpPut
@@ -129,7 +157,7 @@ namespace Ecommerce.Web.Services.Base
                 return null;
             }
         }
-        #endregion
+        #endregion      
 
         #region DoHttpDelete
         protected async Task<HttpResponseMessage?> DoHttpDelete(
