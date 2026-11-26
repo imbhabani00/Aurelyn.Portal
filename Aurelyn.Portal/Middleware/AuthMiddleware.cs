@@ -1,4 +1,5 @@
-﻿using Aurelyn.Portal.Configurations;
+﻿
+using Aurelyn.Portal.Configurations;
 using Aurelyn.Portal.Constants;
 using Aurelyn.Portal.Models.Account;
 using Aurelyn.Portal.Models.Common;
@@ -10,100 +11,159 @@ namespace Aurelyn.Portal.Middleware
 {
     public class AuthMiddleware
     {
-        #region Properties
         private readonly RequestDelegate _next;
         private readonly ILogger<AuthMiddleware> _logger;
-        #endregion
 
-        #region Constructor
-        public AuthMiddleware(RequestDelegate next, ILogger<AuthMiddleware> logger)
+        public AuthMiddleware(
+            RequestDelegate next,
+            ILogger<AuthMiddleware> logger)
         {
             _next = next;
             _logger = logger;
         }
-        #endregion
 
-        #region Invoke
-        public async Task InvokeAsync(HttpContext context, IHttpClientFactory httpClientFactory, AppSettings appSettings)
+        public async Task InvokeAsync(
+            HttpContext context,
+            IHttpClientFactory httpClientFactory,
+            AppSettings appSettings)
         {
-            var path = context.Request.Path.Value?.ToLower();
-            _logger.LogWarning("AuthMiddleware HIT: {Path}", path);
-            // Skip auth for login/logout/Register/VerifyOtp/ResendOtp
+            var path = context.Request.Path.Value?.ToLowerInvariant();
+
+            _logger.LogInformation(
+                "AuthMiddleware HIT: {Path}", path);
+
+            // Public routes
             if (path == null ||
-                    path.Contains(RouteConstants.Login.ToLower()) ||
-                    path.Contains(RouteConstants.Logout.ToLower()) ||
-                    path.Contains(RouteConstants.Register.ToLower()) ||
-                    path.Contains(RouteConstants.VerifyOtp.ToLower()) ||
-                    path.Contains(RouteConstants.ResendOtp.ToLower()) ||
-                    path.Contains(RouteConstants.ForgotPassword.ToLower()) ||
-                    path.Contains(RouteConstants.ResetPassword.ToLower()) ||
-                    path.StartsWith("/error") ||
-                    path.Contains("/account/sendresetcode"))
+                path.Contains(RouteConstants.Login.ToLowerInvariant()) ||
+                path.Contains(RouteConstants.Logout.ToLowerInvariant()) ||
+                path.Contains(RouteConstants.Register.ToLowerInvariant()) ||
+                path.Contains(RouteConstants.VerifyOtp.ToLowerInvariant()) ||
+                path.Contains(RouteConstants.ResendOtp.ToLowerInvariant()) ||
+                path.Contains(RouteConstants.ForgotPassword.ToLowerInvariant()) ||
+                path.Contains(RouteConstants.ResetPassword.ToLowerInvariant()) ||
+                path.StartsWith("/error") ||
+                path.Contains("/account/sendresetcode"))
             {
                 await _next(context);
                 return;
             }
 
-            var accessToken = context.Session.GetString(SessionConstants.AccessToken);
-            var refreshToken = context.Session.GetString(SessionConstants.RefreshToken);
+            var accessToken = context.Session.GetString(
+                SessionConstants.AccessToken);
 
+            var refreshToken = context.Session.GetString(
+                SessionConstants.RefreshToken);
+
+            // Access token missing
             if (string.IsNullOrEmpty(accessToken))
             {
-                context.Response.Redirect(RouteConstants.Login);
+                _logger.LogWarning(
+                    "Access token missing for {Path}", path);
+
+                await HandleUnauthorized(context);
                 return;
             }
 
-            // Check if access token is about to expire (within 5 minutes)
+            // Check expiry
             if (IsTokenExpiredOrExpiring(accessToken))
             {
                 if (!string.IsNullOrEmpty(refreshToken))
                 {
                     var refreshed = await RefreshTokenAsync(
-                        httpClientFactory, appSettings, accessToken, refreshToken);
+                        httpClientFactory,
+                        appSettings,
+                        accessToken,
+                        refreshToken);
 
-                    if (refreshed != null)
+                    if (refreshed != null &&
+                        !string.IsNullOrWhiteSpace(refreshed.AccessToken))
                     {
-                        context.Session.SetString(SessionConstants.AccessToken, refreshed.AccessToken);
-                        context.Session.SetString(SessionConstants.RefreshToken, refreshed.RefreshToken);
-                        _logger.LogInformation("AuthMiddleware: Token refreshed silently.");
+                        context.Session.SetString(
+                            SessionConstants.AccessToken,
+                            refreshed.AccessToken);
+
+                        if (!string.IsNullOrWhiteSpace(
+                            refreshed.RefreshToken))
+                        {
+                            context.Session.SetString(
+                                SessionConstants.RefreshToken,
+                                refreshed.RefreshToken);
+                        }
+
+                        _logger.LogInformation(
+                            "AuthMiddleware: Token refreshed successfully.");
                     }
                     else
                     {
+                        _logger.LogWarning(
+                            "Token refresh failed for {Path}", path);
+
                         context.Session.Clear();
-                        context.Response.Redirect(RouteConstants.Login);
+
+                        await HandleUnauthorized(context);
                         return;
                     }
                 }
                 else
                 {
+                    _logger.LogWarning(
+                        "Refresh token missing for {Path}", path);
+
                     context.Session.Clear();
-                    context.Response.Redirect(RouteConstants.Login);
+
+                    await HandleUnauthorized(context);
                     return;
                 }
             }
 
             await _next(context);
         }
-        #endregion
 
-        #region IsTokenExpiredOrExpiring
+        private static async Task HandleUnauthorized(
+            HttpContext context)
+        {
+            bool isAjax =
+                context.Request.Headers["X-Requested-With"]
+                == "XMLHttpRequest";
+
+            if (isAjax)
+            {
+                context.Response.StatusCode =
+                    StatusCodes.Status401Unauthorized;
+
+                context.Response.ContentType =
+                    "application/json";
+
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    status = false,
+                    message = "Your session has expired. Please login again."
+                });
+
+                return;
+            }
+
+            context.Response.Redirect(RouteConstants.Login);
+        }
+
         private bool IsTokenExpiredOrExpiring(string token)
         {
             try
             {
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
-                var expiry = jwt.ValidTo;
-                return expiry < DateTime.UtcNow.AddMinutes(5);
+
+                return jwt.ValidTo < DateTime.UtcNow.AddMinutes(5);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(
+                    ex, "Unable to read access token expiry.");
+
                 return true;
             }
         }
-        #endregion
 
-        #region RefreshTokenAsync
         private async Task<TokenResponseModel?> RefreshTokenAsync(
             IHttpClientFactory httpClientFactory,
             AppSettings appSettings,
@@ -112,30 +172,61 @@ namespace Aurelyn.Portal.Middleware
         {
             try
             {
-                var client = httpClientFactory.CreateClient("HealthCareApi");
+                var client =
+                    httpClientFactory.CreateClient("HealthCareApi");
+
                 var endpoint = ApiSettings.RefreshTokenEndpoint(
                     appSettings.HealthCareApi.BaseUrl,
                     appSettings.HealthCareApi.Version);
 
-                var payload = new { AccessToken = accessToken, RefreshToken = refreshToken };
+                var payload = new
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+
                 var json = JsonConvert.SerializeObject(payload);
-                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync(endpoint, httpContent);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = new StringContent(
+                    json,
+                    Encoding.UTF8,
+                    "application/json");
 
-                var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(content);
-                if (apiResponse?.Status == true && apiResponse.Response != null)
+                var response = await client.PostAsync(
+                    endpoint, content);
+
+                var responseContent =
+                    await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning(
+                        "Refresh API returned HTTP {StatusCode}",
+                        (int)response.StatusCode);
+
+                    return null;
+                }
+
+                var apiResponse =
+                    JsonConvert.DeserializeObject<ApiResponse>(
+                        responseContent);
+
+                if (apiResponse?.Status == true &&
+                    apiResponse.Response != null)
+                {
                     return JsonConvert.DeserializeObject<TokenResponseModel>(
                         apiResponse.Response.ToString()!);
+                }
 
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(
+                    ex, "RefreshTokenAsync failed.");
+
                 return null;
             }
         }
-        #endregion
     }
 }

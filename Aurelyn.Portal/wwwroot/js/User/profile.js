@@ -147,6 +147,9 @@
             type: "POST",
             data: data,
             dataType: "json",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            },
             success: function (result) {
                 const message = result.message ?? result.Message;
                 const ok = result.status || result.Status || result.success || result.Success;

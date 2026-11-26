@@ -89,7 +89,9 @@ namespace Ecommerce.Web.Services.Base
                         "API GET failed. Endpoint: {Endpoint}, Status: {Status}, Response: {Response}",
                         endpoint,
                         (int)response.StatusCode,
-                        content);
+                        content,
+                        response.Headers.WwwAuthenticate.ToString()
+                        );
                 }
 
                 return response;

@@ -6,10 +6,18 @@
         public ProfileGateMiddleware(RequestDelegate next) => _next = next;
 
         private static readonly string[] Allowed =
-        {
-        "/user/profile", "/user/updateprofile", "/user/ChangePassword",
-        "/account/logout", "/error", "/css", "/js", "/lib", "/images", "/favicon"
-        };
+            {
+                "/user/profile",
+                "/user/updateprofile",
+                "/user/changepassword",
+                "/account/logout",
+                "/error",
+                "/css",
+                "/js",
+                "/lib",
+                "/images",
+                "/favicon"
+            };
 
         public async Task InvokeAsync(HttpContext ctx)
         {

@@ -165,6 +165,7 @@ namespace Aurelyn.App.Controllers
                 SessionHelper.SetRoleId(HttpContext.Session, token.RoleId);
 
                 var profile = await _userService.GetProfileAsync();
+
                 if (profile != null)
                 {
                     SessionHelper.SetTenantId(HttpContext.Session, profile.TenantId);

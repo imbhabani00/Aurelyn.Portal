@@ -36,36 +36,44 @@ namespace Aurelyn.Portal.Service.User
             try
             {
                 var endpoint = $"{AurelynApiUrl}/api/v{AurelynApiVersion}/user/me";
+                Log.Logger.Information("GetProfile: calling {Endpoint}", endpoint);
 
                 var response = await DoHttpGet(endpoint, useAuth: true);
 
                 if (response == null)
+                {
+                    Log.Logger.Error("GetProfile NULL #1: DoHttpGet returned null (token missing in session, or request threw)");
                     return null;
+                }
 
                 var content = await response.Content.ReadAsStringAsync();
+                Log.Logger.Information("GetProfile: HTTP {Status}, body: {Body}", (int)response.StatusCode, content);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Log.Logger.Error(
-                        "GetProfileAsync failed: {StatusCode} - {Content}",
-                        response.StatusCode, content);
-
+                    Log.Logger.Error("GetProfile NULL #2: non-success status {Status}", (int)response.StatusCode);
                     return null;
                 }
 
                 var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(content);
 
-                if (apiResponse?.Status == true && apiResponse.Response != null)
+                if (apiResponse == null || apiResponse.Status != true)
                 {
-                    return JsonConvert.DeserializeObject<UserDetails>(
-                        apiResponse.Response.ToString()!);
+                    Log.Logger.Error("GetProfile NULL #3: ApiResponse null or Status false. Message: {Msg}", apiResponse?.Message);
+                    return null;
                 }
 
-                return null;
+                if (apiResponse.Response == null)
+                {
+                    Log.Logger.Error("GetProfile NULL #4: Response payload is null");
+                    return null;
+                }
+
+                return JsonConvert.DeserializeObject<UserDetails>(apiResponse.Response.ToString()!);
             }
             catch (Exception ex)
             {
-                Log.Logger.Error(ex, "UserService.GetProfileAsync error");
+                Log.Logger.Error(ex, "GetProfile NULL #5: exception");
                 return null;
             }
         }
