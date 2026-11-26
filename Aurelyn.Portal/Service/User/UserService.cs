@@ -1,5 +1,4 @@
-﻿
-using Aurelyn.Portal.Configurations;
+﻿using Aurelyn.Portal.Configurations;
 using Aurelyn.Portal.Models.ChangePasswordViewModel;
 using Aurelyn.Portal.Models.Common;
 using Aurelyn.Portal.Models.User;
@@ -14,6 +13,8 @@ namespace Aurelyn.Portal.Service.User
     {
         Task<UserDetails?> GetProfileAsync();
         Task<ApiResponse> ChangePasswordAsync(ChangePasswordViewModel model);
+        Task<ApiResponse> UpdateProfileAsync(UserProfileUpdateRequest mdodel);
+        Task<ApiResponse> UpdateProfilePictureAsync(IFormFile? file);
     }
     #endregion
 
@@ -126,6 +127,54 @@ namespace Aurelyn.Portal.Service.User
                     Message = "Error occurred"
                 };
             }
+        }
+        #endregion
+
+        #region UpdateProfileAsync
+        public async Task<ApiResponse> UpdateProfileAsync(UserProfileUpdateRequest mdodel)
+        {
+            var data = new ApiResponse();
+            try
+            {
+                var endpoint = $"{AurelynApiUrl}/api/v{AurelynApiVersion}/user/profile-update";
+                var response = await DoHttpPost(endpoint, mdodel, useAuth: true);
+                if(response == null)
+                    return new ApiResponse { Status = false, Message = "Unable to reach the server." };
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ApiResponse>(content);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Profile update error");
+            }
+            return data;
+        }
+        #endregion
+
+        #region UpdateProfilePictureAsync
+        public async Task<ApiResponse> UpdateProfilePictureAsync(IFormFile? file)
+        {
+            try
+            {
+                var endpoint = $"{AurelynApiUrl}/api/v{AurelynApiVersion}/user/profile-picture-update";
+
+                var response = await DoHttpPostMultipart(endpoint, file, "file", useAuth: true);
+                if (response == null)
+                    return new ApiResponse { Status = false, Message = "Unable to reach the server." };
+
+                var body = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrWhiteSpace(body))
+                    return new ApiResponse { Status = false, Message = $"Server returned {(int)response.StatusCode} with no content." };
+
+                return JsonConvert.DeserializeObject<ApiResponse>(body)
+                       ?? new ApiResponse { Status = false, Message = "Invalid server response." };
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Profile picture update error");
+                return new ApiResponse { Status = false, Message = "An error occurred. Please try again." };
+            }   
         }
         #endregion
     }

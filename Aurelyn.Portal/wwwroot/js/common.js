@@ -92,22 +92,18 @@ function loadPopup(url, title, size) {
     var $container = $("#modalContainer");
     var $box = $("#modalBox");
     var $body = $("#modalBody");
-    $box.removeClass("modal-sm modal-lg modal-xl");
-    if (size === "sm") {
-        $box.addClass("modal-sm");
+
+    $box.removeClass("modal-sm modal-md modal-lg modal-xl");
+    if (["sm", "md", "lg", "xl"].indexOf(size) !== -1) {
+        $box.addClass("modal-" + size);
     }
-    else if (size === "lg") {
-        $box.addClass("modal-lg");
-    }
-    else if (size === "xl") {
-        $box.addClass("modal-xl");
-    }
+
     $("#modalTitle").text(title || "");
-    $body.html(
-        '<div class="au-spinner" role="status" aria-label="Loading"></div>'
-    );
+    $body.html('<div class="au-spinner" role="status" aria-label="Loading"></div>');
+    $("#modalClose").prop("disabled", false);
     $backdrop.addClass("open");
     $container.addClass("open");
+
     $.ajax({
         url: url,
         type: "GET",
@@ -125,8 +121,8 @@ function loadPopup(url, title, size) {
         }
     });
 }
-
 function closePopup() {
+    if ($("#modalClose").prop("disabled")) return;
     $("#modalBackdrop, #modalContainer").removeClass("open");
     $("#modalBody").empty();
 }

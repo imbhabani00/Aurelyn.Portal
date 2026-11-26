@@ -23,7 +23,6 @@
     <Folder Include="wwwroot\js\HelpSupport\" />
     <Folder Include="wwwroot\js\Notifications\" />
     <Folder Include="wwwroot\js\Roles\" />
-    <Folder Include="wwwroot\js\User\" />
     <Folder Include="wwwroot\js\Reports\" />
     <Folder Include="wwwroot\js\Payments\" />
     <Folder Include="wwwroot\js\PharmacyStore\" />

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aurelyn.App.Controllers
 {
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public class ErrorController : Controller
+    public class ErrorController : BaseController
     {
         #region Properties
         private readonly ILogger<ErrorController> _logger;

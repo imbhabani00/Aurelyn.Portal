@@ -13,7 +13,8 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
-    // Serilog
+    #region Serilog
+
     builder.Host.UseSerilog((context, services, config) =>
     {
         config.ReadFrom.Configuration(context.Configuration)
@@ -22,47 +23,103 @@ try
               .WriteTo.Console();
     });
 
-    // MVC
+    #endregion
+
+    #region MVC
+
     builder.Services.AddControllersWithViews();
 
-    // Session
+    #endregion
+
+    #region Distributed Cache
+
+    builder.Services.AddDistributedMemoryCache();
+
+    #endregion
+
+    #region Session
+
     builder.Services.AddSessionConfig(builder.Configuration);
 
-    // HttpContextAccessor
+    #endregion
+
+    #region HttpContextAccessor
+
     builder.Services.AddHttpContextAccessor();
+
+    #endregion
+
+    #region SignalR
 
     builder.Services.AddSignalR();
 
-    // Services + HttpClient + AppSettings
+    #endregion
+
+    #region Application Services
+
     builder.Services.AddApplicationServices(builder.Configuration);
 
-    // Routing
+    #endregion
+
+    #region Routing
+
     builder.Services.AddRouting(options =>
     {
         options.LowercaseUrls = true;
         options.LowercaseQueryStrings = true;
     });
 
+    #endregion
+
+    #region Antiforgery
+
     builder.Services.AddAntiforgery(options =>
     {
         options.HeaderName = "RequestVerificationToken";
     });
 
-    //builder.Services.Configure<EmailSettings>(
-    //builder.Configuration.GetSection("EmailSettings"));
+    #endregion
 
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    })
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // short-lived; just used during the handshake
-    });
+    #region Authentication
+
+    builder.Services
+        .AddAuthentication(options =>
+        {
+            options.DefaultScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+
+            options.DefaultAuthenticateScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+
+            options.DefaultChallengeScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+
+            options.DefaultSignInScheme =
+                CookieAuthenticationDefaults.AuthenticationScheme;
+        })
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+
+            options.ExpireTimeSpan =
+                TimeSpan.FromMinutes(10);
+
+            options.SlidingExpiration = true;
+
+            options.Cookie.HttpOnly = true;
+
+            options.Cookie.SecurePolicy =
+                CookieSecurePolicy.Always;
+
+            options.Cookie.SameSite =
+                SameSiteMode.Strict;
+        });
+
+    #endregion
 
     var app = builder.Build();
+
+    #region Exception Handling
 
     if (!app.Environment.IsDevelopment())
     {
@@ -70,23 +127,51 @@ try
         app.UseHsts();
     }
 
+    #endregion
+
+    #region Middleware Pipeline
+
     app.UseMiddleware<ExceptionMiddleware>();
+
+    app.UseStatusCodePagesWithReExecute(
+        "/Error/Index",
+        "?code={0}");
+
     app.UseHttpsRedirection();
+
     app.UseStaticFiles();
+
     app.UseRouting();
+
+    // Session must be available before custom middleware.
     app.UseSession();
-    app.UseMiddleware<AuthMiddleware>();
+
+    // Authenticate the current Web application user.
     app.UseAuthentication();
+
+    // Apply authorization policies.
     app.UseAuthorization();
 
+    // Custom middleware can now access authenticated user information.
+    app.UseMiddleware<AuthMiddleware>();
+
+    app.UseMiddleware<ProfileGateMiddleware>();
+
+    #endregion
+
+    #region Endpoints
 
     app.MapControllerRoute(
-    name: "tenant",
-    pattern: "t/{tenant}/{controller=Home}/{action=Index}/{id?}");
+        name: "tenant",
+        pattern: "t/{tenant}/{controller=Home}/{action=Index}/{id?}");
 
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Account}/{action=Login}/{id?}");
+
+    #endregion
+
+    Log.Information("Ecommerce Web started successfully.");
 
     await app.RunAsync();
 }

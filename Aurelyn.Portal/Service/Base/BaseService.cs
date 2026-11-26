@@ -38,23 +38,38 @@ namespace Ecommerce.Web.Services.Base
         #region GetHttpClient
         private HttpClient GetHttpClient()
         {
+            var context = _httpContextAccessor.HttpContext;
+
+            if (context == null)
+                throw new InvalidOperationException("HttpContext is missing.");
+
+            var token = context.Session.GetString(
+                SessionConstants.AccessToken);
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                Log.Logger.Error("API request failed: Access token missing from Session.");
+                throw new UnauthorizedAccessException(
+                    "Access token not found in Session.");
+            }
+
             var client = _httpClientFactory.CreateClient("HealthCareApi");
 
-            var token = _httpContextAccessor.HttpContext?.Session
-                .GetString(SessionConstants.AccessToken);
+            Log.Logger.Information(
+                "API request: Session available, access token present. Token length: {Length}",
+                token.Length);
 
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-            }
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
             return client;
         }
 
+
         #endregion
 
         #region DoHttpGet
+
         protected async Task<HttpResponseMessage?> DoHttpGet(
             string endpoint, bool useAuth = true)
         {
@@ -64,14 +79,27 @@ namespace Ecommerce.Web.Services.Base
                     ? GetHttpClient()
                     : _httpClientFactory.CreateClient("HealthCareApi");
 
-                return await client.GetAsync(endpoint);
+                var response = await client.GetAsync(endpoint);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    Log.Logger.Error(
+                        "API GET failed. Endpoint: {Endpoint}, Status: {Status}, Response: {Response}",
+                        endpoint,
+                        (int)response.StatusCode,
+                        content);
+                }
+
+                return response;
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Logger.Error(ex, "DoHttpGet exception: {Endpoint}", endpoint);
                 return null;
             }
         }
-
         #endregion
 
         #region DoHttpPut
@@ -129,7 +157,7 @@ namespace Ecommerce.Web.Services.Base
                 return null;
             }
         }
-        #endregion
+        #endregion      
 
         #region DoHttpDelete
         protected async Task<HttpResponseMessage?> DoHttpDelete(
@@ -151,10 +179,10 @@ namespace Ecommerce.Web.Services.Base
 
         #endregion
 
-        #region DoHttpPostFile
-        protected async Task<HttpResponseMessage?> DoHttpPostFile(
+        #region DoHttpPostMultipart
+        protected async Task<HttpResponseMessage?> DoHttpPostMultipart(
             string endpoint,
-            IFormFile file,
+            IFormFile? file,
             string fieldName = "file",
             bool useAuth = true)
         {
@@ -165,25 +193,30 @@ namespace Ecommerce.Web.Services.Base
                     : _httpClientFactory.CreateClient("HealthCareApi");
 
                 using var content = new MultipartFormDataContent();
-                using var fileStream = file.OpenReadStream();
-                using var streamContent = new StreamContent(fileStream);
+                await using var fileStream = file?.OpenReadStream();
 
-                streamContent.Headers.ContentType =
-                    new MediaTypeHeaderValue(
-                        string.IsNullOrEmpty(file.ContentType)
-                            ? "application/octet-stream"
-                            : file.ContentType);
+                if (file != null && file.Length > 0 && fileStream != null)
+                {
+                    var streamContent = new StreamContent(fileStream);
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue(
+                        string.IsNullOrEmpty(file.ContentType) ? "application/octet-stream" : file.ContentType);
+                    content.Add(streamContent, fieldName, file.FileName);
+                }
+                else
+                {
+                    content.Add(new StringContent("true"), "remove");
+                }
 
-                content.Add(streamContent, fieldName, file.FileName);
+                using var request = new HttpRequestMessage(HttpMethod.Post, endpoint) { Content = content };
 
-                return await client.PostAsync(endpoint, content);
+                return await client.SendAsync(request);
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Logger.Error(ex, "DoHttpPostMultipart error. Endpoint: {Endpoint}", endpoint);
                 return null;
             }
         }
-
         #endregion
 
         #region DoHttpPostNoBody
@@ -205,42 +238,5 @@ namespace Ecommerce.Web.Services.Base
         }
 
         #endregion
-
-        //#region ApiResponse
-        //protected async Task<Aurelyn.Portal.Models.Common.ApiResponse> ApiResponse(
-        //    HttpResponseMessage? response)
-        //{
-        //    try
-        //    {
-        //        if (response == null)
-        //        {
-        //            return new Aurelyn.Portal.Models.Common.ApiResponse
-        //            {
-        //                Status = false,
-        //                Message = "Unable to connect to API."
-        //            };
-        //        }
-
-        //        var content = await response.Content.ReadAsStringAsync();
-
-        //        var apiResponse =
-        //            JsonConvert.DeserializeObject<Aurelyn.Portal.Models.Common.ApiResponse>(content);
-
-        //        return apiResponse ?? new Aurelyn.Portal.Models.Common.ApiResponse
-        //        {
-        //            Status = false,
-        //            Message = "Invalid API response."
-        //        };
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return new Aurelyn.Portal.Models.Common.ApiResponse
-        //        {
-        //            Status = false,
-        //            Message = "Error while processing API response."
-        //        };
-        //    }
-        //}
-        //#endregion
     }
 }
