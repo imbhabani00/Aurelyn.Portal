@@ -174,7 +174,7 @@ namespace Aurelyn.Portal.Service.User
             {
                 Log.Logger.Error(ex, "Profile picture update error");
                 return new ApiResponse { Status = false, Message = "An error occurred. Please try again." };
-            }
+            }   
         }
         #endregion
     }

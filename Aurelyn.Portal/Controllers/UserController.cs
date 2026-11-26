@@ -26,23 +26,32 @@ namespace Aurelyn.App.Controllers
         #endregion
 
         #region Profile GET
+
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
             try
             {
                 var profile = await _userService.GetProfileAsync();
+
                 if (profile == null)
-                    return PartialView("_Profile", null);
+                {
+                    _logger.LogWarning(
+                        "Profile not found for current user.");
+
+                    return NotFound("User profile not found.");
+                }
 
                 return PartialView("_Profile", profile);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "UserController.Profile error");
-                return PartialView("_Profile", null);
+
+                return StatusCode(500, "Unable to load user profile.");
             }
         }
+
         #endregion
 
         #region ChangePassword GET
@@ -114,7 +123,7 @@ namespace Aurelyn.App.Controllers
         }
         #endregion
 
-        #region UpdateProfile
+        #region UpdateProfilePicture
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProfilePicture(IFormFile? file)
